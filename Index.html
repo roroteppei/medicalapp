@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猫の糖尿病・DKA・膵炎クイズ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+–bg: #0a0e1a;
+–surface: #111827;
+–surface2: #1a2235;
+–border: #1e2d45;
+–accent: #00d4ff;
+–accent2: #ff6b6b;
+–correct: #00e676;
+–wrong: #ff5252;
+–text: #e2e8f0;
+–text-muted: #64748b;
+–chapter: #7c3aed;
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Noto Sans JP’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* Grid background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
+
+.container {
+position: relative;
+z-index: 1;
+max-width: 780px;
+margin: 0 auto;
+padding: 24px 16px 60px;
+}
+
+/* Header */
+.header {
+text-align: center;
+margin-bottom: 32px;
+padding: 32px 24px;
+background: linear-gradient(135deg, #0f172a, #1a2235);
+border: 1px solid var(–border);
+border-top: 3px solid var(–accent);
+border-radius: 2px;
+position: relative;
+overflow: hidden;
+}
+.header::after {
+content: ‘’;
+position: absolute;
+top: -40px; right: -40px;
+width: 140px; height: 140px;
+background: radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%);
+pointer-events: none;
+}
+.header-tag {
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+color: var(–accent);
+letter-spacing: 3px;
+text-transform: uppercase;
+margin-bottom: 12px;
+display: block;
+}
+.header h1 {
+font-size: clamp(20px, 4vw, 28px);
+font-weight: 900;
+line-height: 1.3;
+letter-spacing: -0.5px;
+}
+.header h1 span { color: var(–accent); }
+.header-sub {
+margin-top: 10px;
+font-size: 13px;
+color: var(–text-muted);
+font-weight: 300;
+}
+
+/* Progress bar */
+.progress-wrap {
+margin-bottom: 24px;
+}
+.progress-info {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 8px;
+font-size: 12px;
+}
+.progress-label {
+font-family: ‘Space Mono’, monospace;
+color: var(–accent);
+letter-spacing: 1px;
+}
+.progress-count {
+font-family: ‘Space Mono’, monospace;
+color: var(–text-muted);
+}
+.progress-bar-bg {
+height: 4px;
+background: var(–border);
+border-radius: 2px;
+overflow: hidden;
+}
+.progress-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–accent), #7c3aed);
+border-radius: 2px;
+transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Score header */
+.score-strip {
+display: flex;
+gap: 12px;
+margin-bottom: 24px;
+}
+.score-card {
+flex: 1;
+padding: 14px 16px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 2px;
+text-align: center;
+}
+.score-card .label {
+font-size: 10px;
+color: var(–text-muted);
+font-family: ‘Space Mono’, monospace;
+letter-spacing: 1px;
+display: block;
+margin-bottom: 4px;
+}
+.score-card .value {
+font-size: 22px;
+font-weight: 700;
+font-family: ‘Space Mono’, monospace;
+}
+.score-card.correct .value { color: var(–correct); }
+.score-card.wrong .value { color: var(–wrong); }
+.score-card.total .value { color: var(–accent); }
+
+/* Chapter badge */
+.chapter-badge {
+display: inline-block;
+padding: 4px 12px;
+background: rgba(124,58,237,0.15);
+border: 1px solid rgba(124,58,237,0.4);
+border-radius: 2px;
+font-size: 11px;
+font-family: ‘Space Mono’, monospace;
+color: #a78bfa;
+letter-spacing: 1px;
+margin-bottom: 16px;
+}
+
+/* Quiz card */
+.quiz-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 2px;
+padding: 28px 24px;
+margin-bottom: 16px;
+animation: slideIn 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+.quiz-card::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 3px;
+background: var(–accent);
+}
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(16px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.q-number {
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+color: var(–text-muted);
+letter-spacing: 2px;
+margin-bottom: 12px;
+display: block;
+}
+.q-text {
+font-size: 17px;
+font-weight: 600;
+line-height: 1.6;
+margin-bottom: 24px;
+}
+
+/* Options */
+.options {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.option-btn {
+display: flex;
+align-items: center;
+gap: 14px;
+padding: 14px 18px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 2px;
+cursor: pointer;
+text-align: left;
+font-family: ‘Noto Sans JP’, sans-serif;
+font-size: 14px;
+color: var(–text);
+transition: all 0.18s ease;
+width: 100%;
+}
+.option-btn:hover:not(:disabled) {
+border-color: var(–accent);
+background: rgba(0,212,255,0.06);
+transform: translateX(3px);
+}
+.option-label {
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+color: var(–text-muted);
+min-width: 24px;
+font-weight: 700;
+letter-spacing: 1px;
+}
+.option-btn.correct {
+border-color: var(–correct);
+background: rgba(0,230,118,0.08);
+animation: pulse-correct 0.4s ease;
+}
+.option-btn.wrong {
+border-color: var(–wrong);
+background: rgba(255,82,82,0.08);
+}
+.option-btn.correct .option-label { color: var(–correct); }
+.option-btn.wrong .option-label { color: var(–wrong); }
+.option-btn:disabled { cursor: default; }
+
+@keyframes pulse-correct {
+0% { transform: scale(1); }
+50% { transform: scale(1.01); }
+100% { transform: scale(1); }
+}
+
+/* Result panel */
+.result-panel {
+display: none;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 2px;
+padding: 18px 20px;
+margin-top: 14px;
+animation: fadeIn 0.3s ease;
+font-size: 13px;
+line-height: 1.7;
+color: var(–text-muted);
+}
+.result-panel.show { display: block; }
+.result-panel strong { color: var(–text); }
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+.result-label {
+display: flex;
+align-items: center;
+gap: 8px;
+font-weight: 700;
+margin-bottom: 8px;
+font-size: 14px;
+}
+.result-label.ok { color: var(–correct); }
+.result-label.ng { color: var(–wrong); }
+.result-icon {
+font-size: 18px;
+line-height: 1;
+}
+
+/* Next button */
+.next-btn {
+display: none;
+width: 100%;
+margin-top: 16px;
+padding: 14px 24px;
+background: var(–accent);
+color: #0a0e1a;
+border: none;
+border-radius: 2px;
+font-family: ‘Noto Sans JP’, sans-serif;
+font-weight: 700;
+font-size: 14px;
+cursor: pointer;
+letter-spacing: 0.5px;
+transition: all 0.2s ease;
+}
+.next-btn:hover { background: #00b8d9; transform: translateY(-1px); }
+.next-btn.show { display: block; }
+
+/* Chapter nav */
+.chapter-nav {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 24px;
+}
+.chapter-btn {
+padding: 6px 14px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 2px;
+color: var(–text-muted);
+font-size: 12px;
+cursor: pointer;
+font-family: ‘Noto Sans JP’, sans-serif;
+transition: all 0.15s ease;
+}
+.chapter-btn:hover, .chapter-btn.active {
+border-color: var(–accent);
+color: var(–accent);
+background: rgba(0,212,255,0.05);
+}
+
+/* Final result */
+.final-screen {
+display: none;
+text-align: center;
+padding: 48px 24px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 2px;
+animation: slideIn 0.4s ease;
+}
+.final-screen.show { display: block; }
+.final-score-big {
+font-size: clamp(52px, 12vw, 80px);
+font-family: ‘Space Mono’, monospace;
+font-weight: 700;
+line-height: 1;
+margin-bottom: 12px;
+}
+.final-grade {
+font-size: 18px;
+margin-bottom: 32px;
+color: var(–text-muted);
+}
+.final-grade span { font-weight: 700; }
+.restart-btn {
+padding: 14px 36px;
+background: transparent;
+border: 2px solid var(–accent);
+color: var(–accent);
+border-radius: 2px;
+font-family: ‘Noto Sans JP’, sans-serif;
+font-weight: 700;
+font-size: 15px;
+cursor: pointer;
+letter-spacing: 0.5px;
+transition: all 0.2s ease;
+}
+.restart-btn:hover {
+background: var(–accent);
+color: #0a0e1a;
+}
+
+/* Mode selector */
+.mode-bar {
+display: flex;
+gap: 8px;
+margin-bottom: 20px;
+background: var(–surface);
+border: 1px solid var(–border);
+padding: 8px;
+border-radius: 2px;
+}
+.mode-btn {
+flex: 1;
+padding: 8px 12px;
+background: transparent;
+border: 1px solid transparent;
+border-radius: 2px;
+color: var(–text-muted);
+font-size: 12px;
+cursor: pointer;
+font-family: ‘Noto Sans JP’, sans-serif;
+transition: all 0.15s ease;
+text-align: center;
+}
+.mode-btn.active {
+background: rgba(0,212,255,0.1);
+border-color: var(–accent);
+color: var(–accent);
+font-weight: 700;
+}
+
+/* Tooltip/hint */
+.answer-badge {
+display: inline-block;
+padding: 2px 8px;
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+border-radius: 2px;
+margin-left: 8px;
+}
+.answer-badge.ok { background: rgba(0,230,118,0.15); color: var(–correct); }
+.answer-badge.ng { background: rgba(255,82,82,0.15); color: var(–wrong); }
+
+@media (max-width: 480px) {
+.score-strip { gap: 8px; }
+.score-card { padding: 10px 8px; }
+.score-card .value { font-size: 18px; }
+.quiz-card { padding: 20px 16px; }
+}
+</style>
+
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+
+  <div class="header">
+    <span class="header-tag">🐾 Veterinary Clinical Quiz</span>
+    <h1>猫の<span>糖尿病</span>・<span>DKA</span>・<span>膵炎</span></h1>
+    <div class="header-sub">全50問｜10章構成｜スタッフ教育用</div>
+  </div>
+
+  <!-- Mode selector -->
+
+  <div class="mode-bar" id="modeBar">
+    <button class="mode-btn active" onclick="setMode('all')">全問（50問）</button>
+    <button class="mode-btn" onclick="setMode('chapter')">章別</button>
+    <button class="mode-btn" onclick="setMode('random')">ランダム10問</button>
+  </div>
+
+  <!-- Chapter nav (hidden by default) -->
+
+  <div class="chapter-nav" id="chapterNav" style="display:none">
+    <button class="chapter-btn" onclick="startChapter(0)">第1章 基礎・病態</button>
+    <button class="chapter-btn" onclick="startChapter(1)">第2章 診断</button>
+    <button class="chapter-btn" onclick="startChapter(2)">第3章 DKA治療</button>
+    <button class="chapter-btn" onclick="startChapter(3)">第4章 膵炎管理</button>
+    <button class="chapter-btn" onclick="startChapter(4)">第5章 栄養</button>
+    <button class="chapter-btn" onclick="startChapter(5)">第6章 合併症</button>
+    <button class="chapter-btn" onclick="startChapter(6)">第7章 抗菌薬</button>
+    <button class="chapter-btn" onclick="startChapter(7)">第8章 実践判断</button>
+    <button class="chapter-btn" onclick="startChapter(8)">第9章 応用</button>
+    <button class="chapter-btn" onclick="startChapter(9)">第10章 総合</button>
+  </div>
+
+  <!-- Score strip -->
+
+  <div class="score-strip" id="scoreStrip" style="display:none">
+    <div class="score-card total">
+      <span class="label">TOTAL</span>
+      <span class="value" id="scoreTotal">0</span>
+    </div>
+    <div class="score-card correct">
+      <span class="label">CORRECT</span>
+      <span class="value" id="scoreCorrect">0</span>
+    </div>
+    <div class="score-card wrong">
+      <span class="label">WRONG</span>
+      <span class="value" id="scoreWrong">0</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <div class="progress-info">
+      <span class="progress-label">PROGRESS</span>
+      <span class="progress-count" id="progressCount">0 / 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Quiz area -->
+
+  <div id="quizArea"></div>
+
+  <!-- Final screen -->
+
+  <div class="final-screen" id="finalScreen">
+    <div class="final-score-big" id="finalScoreText">0/0</div>
+    <div class="final-grade" id="finalGrade"></div>
+    <button class="restart-btn" onclick="restart()">もう一度挑戦する</button>
+  </div>
+
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // 第1章：基礎・病態
+  { chapter: "第1章：基礎・病態", q: "猫の糖尿病の主なタイプは？", options: ["1型主体", "2型主体"], answer: 1, exp: "猫はインスリン抵抗性主体の2型が多い。" },
+  { chapter: "第1章：基礎・病態", q: "DKA（糖尿病性ケトアシドーシス）の三徴は？", options: ["高血糖・ケトン血症・アシドーシス", "高血圧・高脂血症・高尿酸"], answer: 0, exp: "DKAの定義的三徴。高血糖・ケトン血症・代謝性アシドーシスが揃って初めて診断できる。" },
+  { chapter: "第1章：基礎・病態", q: "ケトン体の主成分は？", options: ["βヒドロキシ酪酸", "乳酸"], answer: 0, exp: "DKA時に最も多いケトン体はβヒドロキシ酪酸。尿検査で検出されるアセト酢酸より血中濃度が高い。" },
+  { chapter: "第1章：基礎・病態", q: "DKAで増加する拮抗ホルモンは？", options: ["インスリン", "グルカゴン"], answer: 1, exp: "インスリン欠乏＋グルカゴン・コルチゾール等の拮抗ホルモン増加が病態の本質。" },
+  { chapter: "第1章：基礎・病態", q: "膵炎が糖尿病を誘発する主な理由は？", options: ["β細胞破壊によるインスリン分泌低下", "血圧低下"], answer: 0, exp: "膵炎によるβ細胞へのダメージがインスリン分泌を障害し、糖尿病を誘発する。" },
+  // 第2章：診断
+  { chapter: "第2章：診断", q: "DKAで最も信頼性の高いケトン評価は？", options: ["尿ケトン定性", "血中βヒドロキシ酪酸測定"], answer: 1, exp: "尿ケトンは治療遅延時に偽陰性になりやすい。血中βヒドロキシ酪酸がより正確。" },
+  { chapter: "第2章：診断", q: "猫の正常血糖値は？", options: ["70–150 mg/dL", "200–300 mg/dL"], answer: 0, exp: "ストレスで上昇するが正常基準はこれ。200以上が持続すれば糖尿病を疑う。" },
+  { chapter: "第2章：診断", q: "DKAでよくみられる電解質異常は？", options: ["高K血症（高カリウム血症）のみ", "低K血症（低カリウム血症）"], answer: 1, exp: "血清Kは正常〜高値でも体内は枯渇している。補液・インスリン開始後に急落するため補充必須。" },
+  { chapter: "第2章：診断", q: "猫膵炎の診断で特異性が高い検査は？", options: ["fPL（猫膵臓リパーゼ）", "ALT（肝酵素）"], answer: 0, exp: "fPLは膵炎への特異性が比較的高い。ただし100%ではないため臨床所見との統合が必要。" },
+  { chapter: "第2章：診断", q: "猫の膵炎で最も多い症状は？", options: ["激しい嘔吐", "食欲低下のみ（非典型的）"], answer: 1, exp: "犬と異なり猫の膵炎は非典型的。食欲低下・元気消失が主体で嘔吐が目立たないことが多い。" },
+  // 第3章：DKA治療
+  { chapter: "第3章：治療（DKA）", q: "DKA初期治療で最優先は？", options: ["インスリン投与", "補液による循環改善"], answer: 1, exp: "脱水・ショック改善が最優先。補液なしでインスリンを先行すると低血圧が悪化し危険。" },
+  { chapter: "第3章：治療（DKA）", q: "DKA急性期に使用するインスリンは？", options: ["ProZinc（プロジンク）", "レギュラーインスリン（速効型）"], answer: 1, exp: "急性期は速効型レギュラーインスリンで調節可能なコントロールを行う。" },
+  { chapter: "第3章：治療（DKA）", q: "血糖低下速度の目安は？", options: ["200 mg/dL/時間（急速低下）", "50–100 mg/dL/時間（緩徐低下）"], answer: 1, exp: "急速な低下は脳浮腫リスク。50〜100 mg/dL/hを目標に調整する。" },
+  { chapter: "第3章：治療（DKA）", q: "血糖が下がりすぎた場合の対応は？", options: ["インスリン中止のみ", "デキストロース（ブドウ糖）追加輸液"], answer: 1, exp: "インスリンはケトン消失まで継続が必要。血糖が下がりすぎたらデキストロース添加で対応。" },
+  { chapter: "第3章：治療（DKA）", q: "DKAでリン補正が重要な理由は？", options: ["筋力低下・溶血防止", "心拍数低下防止"], answer: 0, exp: "低リン血症は溶血性貧血・筋力低下・呼吸筋疲弊を引き起こす。補充タイミングの判断が重要。" },
+  // 第4章：膵炎管理
+  { chapter: "第4章：膵炎管理", q: "猫膵炎治療の中心は？", options: ["抗菌薬", "支持療法（補液・制吐・鎮痛）"], answer: 1, exp: "猫膵炎は感染性でないことが多く、支持療法が治療の本体。" },
+  { chapter: "第4章：膵炎管理", q: "制吐薬の第一選択（猫）は？", options: ["マロピタント（サーニア）", "プレドニゾロン"], answer: 0, exp: "NK1受容体拮抗薬マロピタントが猫の悪心・嘔吐に有効。鎮痛効果も一部ある。" },
+  { chapter: "第4章：膵炎管理", q: "膵炎での疼痛管理に使う薬は？", options: ["NSAIDs（非ステロイド性抗炎症薬）", "オピオイド（ブプレノルフィン等）"], answer: 1, exp: "猫ではNSAIDsは腎障害リスクがあり禁忌に近い。オピオイドが疼痛管理の主体。" },
+  { chapter: "第4章：膵炎管理", q: "膵炎で絶食は必須か？", options: ["必須", "必須ではない（早期経腸栄養推奨）"], answer: 1, exp: "かつては膵臓安静のため絶食が行われたが、現在は早期経腸栄養が腸管バリア維持に有利とされる。" },
+  { chapter: "第4章：膵炎管理", q: "膵炎で食べない場合の対応は？", options: ["放置して様子をみる", "経腸栄養（チューブ給餌）"], answer: 1, exp: "48時間以上食べない場合は積極的な経腸栄養を検討。肝リピドーシス予防の意味でも重要。" },
+  // 第5章：栄養
+  { chapter: "第5章：栄養", q: "安静時エネルギー要求量（RER）の計算式は？", options: ["30×体重(kg)", "70×体重(kg)^0.75"], answer: 1, exp: "RER(kcal/日)=70×体重^0.75。これを基準に給餌量を設定する。" },
+  { chapter: "第5章：栄養", q: "経腸栄養開始初日の給餌量は？", options: ["RERの100%から開始", "RERの25〜33%から開始"], answer: 1, exp: "消化管への急激な負荷を避けるため、初日は少量から開始し段階的に増量する。" },
+  { chapter: "第5章：栄養", q: "重症患者への給餌間隔は？", options: ["1日1回まとめて", "4〜6時間ごと（q4–6h）"], answer: 1, exp: "頻回少量投与で消化管への負荷を分散。血糖変動も小さくなる。" },
+  { chapter: "第5章：栄養", q: "強制給餌（シリンジ強制投与）のリスクは？", options: ["食欲増進につながる", "食物嫌悪（フードアバーション）形成"], answer: 1, exp: "無理に食べさせると入院中の食事と嘔吐が結びつき、その食事を嫌うようになる。チューブの方が安全。" },
+  { chapter: "第5章：栄養", q: "猫への長期栄養補給で最も安全な方法は？", options: ["シリンジ強制給餌", "食道チューブ（EチューブまたはNGチューブ）"], answer: 1, exp: "食道チューブは比較的容易に設置でき、長期使用でも食物嫌悪を生じにくい。" },
+  // 第6章：合併症
+  { chapter: "第6章：合併症", q: "DKAで最も危険な電解質異常は？", options: ["低K血症（低カリウム血症）", "高Na血症（高ナトリウム血症）"], answer: 0, exp: "低Kは心室性不整脈・筋力低下・呼吸停止のリスク。インスリン開始前後で必ず確認。" },
+  { chapter: "第6章：合併症", q: "低リン血症で起こる合併症は？", options: ["溶血性貧血", "高血圧"], answer: 0, exp: "重篤な低リン血症（<1.5 mg/dL）では赤血球が脆弱化し溶血する。" },
+  { chapter: "第6章：合併症", q: "DKAの主な死亡原因は？", options: ["低血糖", "多臓器不全（MOF）"], answer: 1, exp: "感染・血栓・電解質異常が連鎖して多臓器不全に至る。全身管理が生死を分ける。" },
+  { chapter: "第6章：合併症", q: "膵炎と並発しやすい疾患は？", options: ["胆管炎（胆管肝炎）", "甲状腺機能低下症"], answer: 0, exp: "猫では膵炎・胆管肝炎・炎症性腸疾患が三臓器炎（トライアダイティス）として同時発症しやすい。" },
+  { chapter: "第6章：合併症", q: "猫でよくみられる三臓器炎の組み合わせは？", options: ["膵臓・肝臓・腸管", "肺・腎・心"], answer: 0, exp: "Triaditis（トライアダイティス）。3つ全て治療しないと改善しないことが多い。" },
+  // 第7章：抗菌薬
+  { chapter: "第7章：抗菌薬", q: "DKAでの抗菌薬使用の方針は？", options: ["全例ルーチン投与", "感染を示唆する所見がある場合のみ"], answer: 1, exp: "感染がDKA誘引の場合は使用するが、感染証拠なしの全例投与は薬剤耐性の観点から推奨されない。" },
+  { chapter: "第7章：抗菌薬", q: "尿路感染疑い時の第一選択は？", options: ["アモキシシリン・クラブラン酸系", "バンコマイシン（最終手段）"], answer: 0, exp: "感受性試験結果が出るまでの経験的治療としてアモキシシリン・クラブラン酸が使われることが多い。" },
+  { chapter: "第7章：抗菌薬", q: "抗菌薬開始前に必ず行うことは？", options: ["何もしない", "培養検体の採取（尿・血液等）"], answer: 1, exp: "抗菌薬投与後では培養が偽陰性になる。原因菌特定のため必ず先に採取する。" },
+  { chapter: "第7章：抗菌薬", q: "膵炎単独（感染徴候なし）での抗菌薬は？", options: ["必須（予防的投与）", "通常不要"], answer: 1, exp: "無菌性膵炎では予防的抗菌薬投与の有効性は示されておらず、不要とされる。" },
+  { chapter: "第7章：抗菌薬", q: "敗血症疑いの場合の対応は？", options: ["直ちに広域抗菌薬を開始", "様子をみてから判断"], answer: 0, exp: "敗血症では1時間以内の抗菌薬開始が生存率に直結する（サワーアワーの概念）。" },
+  // 第8章：実践判断
+  { chapter: "第8章：実践判断", q: "食欲なし＋尿ケトン陽性＋脱水の猫の対応は？", options: ["外来処置のみ", "即入院・集中管理"], answer: 1, exp: "この3徴が揃えばDKAの可能性が高い。外来での対応は危険。補液・電解質管理のため入院が必須。" },
+  { chapter: "第8章：実践判断", q: "DKA急性期にProZincのみでの管理は？", options: ["十分（長時間作用で安定）", "不十分（速効型への切替が必要）"], answer: 1, exp: "ProZincは長時間作用型。急性期の細かな調節にはレギュラーインスリンが必須。" },
+  { chapter: "第8章：実践判断", q: "食べない猫にまず行うべきことは？", options: ["食欲刺激薬の投与", "悪心・嘔吐のコントロール（制吐）"], answer: 1, exp: "悪心を取り除かないと食欲刺激薬も効かない。原因への対処が先。" },
+  { chapter: "第8章：実践判断", q: "インスリンだけで改善しない最大の理由は？", options: ["インスリンの技術的問題", "基礎疾患（感染・膵炎等）の未治療"], answer: 1, exp: "DKAの誘引となった基礎疾患を治療しなければ、インスリンだけでは安定しない。" },
+  { chapter: "第8章：実践判断", q: "DKA管理で最も重要な視点は？", options: ["血糖値の管理だけ", "全身代謝の管理（電解質・水分・栄養を含む）"], answer: 1, exp: "DKAは血糖の病気ではなく全身代謝破綻。電解質・水分・栄養・基礎疾患すべてに目を向ける必要がある。" },
+  // 第9章：応用
+  { chapter: "第9章：応用", q: "ケトンが残存する主な理由は？", options: ["水分不足", "インスリン不足（量または頻度）"], answer: 1, exp: "インスリンがないとケトン体産生が続く。「血糖は下がったのにケトンが残る」場合もインスリン不足が多い。" },
+  { chapter: "第9章：応用", q: "血糖が正常でもケトンが残る理由は？", options: ["測定ミス", "絶対的インスリン不足の継続"], answer: 1, exp: "デキストロース追加で血糖だけ正常化しても、インスリン不足が続けばケトン産生は止まらない。" },
+  { chapter: "第9章：応用", q: "膵炎猫で食欲低下の最大の原因は？", options: ["胃炎", "悪心（吐き気）"], answer: 1, exp: "猫は悪心が強くても嘔吐しないことがある。悪心コントロールが食欲回復の鍵。" },
+  { chapter: "第9章：応用", q: "輸液で全身状態が改善する主な理由は？", options: ["血糖が直接下がる", "循環改善による組織灌流の回復"], answer: 1, exp: "脱水改善→腎血流改善→酸塩基平衡改善→全身状態改善というカスケード。" },
+  { chapter: "第9章：応用", q: "DKA改善の最も重要な指標は？", options: ["血糖値の正常化のみ", "血中ケトン体の消失"], answer: 1, exp: "血糖が正常化しても、ケトン体が残存していればDKAは改善していない。ケトン消失が真の回復指標。" },
+  // 第10章：総合
+  { chapter: "第10章：総合", q: "DKA管理の最重要3要素は？", options: ["補液・インスリン・電解質補正", "食事・運動・休息"], answer: 0, exp: "この3つが揃わないと治療は成立しない。それぞれが相互に影響し合う。" },
+  { chapter: "第10章：総合", q: "猫膵炎治療で最も重要なのは？", options: ["抗菌薬投与", "支持療法（補液・鎮痛・制吐・栄養）"], answer: 1, exp: "膵炎の本体治療は支持療法。感染合併がなければ抗菌薬は不要。" },
+  { chapter: "第10章：総合", q: "猫での栄養戦略として推奨されるのは？", options: ["絶食による膵臓安静", "早期経腸栄養による腸管バリア維持"], answer: 1, exp: "長期絶食は肝リピドーシスや免疫低下のリスク。早期経腸栄養が現在の標準的考え方。" },
+  { chapter: "第10章：総合", q: "臨床で失敗しやすいポイントは？", options: ["投薬忘れ", "栄養・電解質管理の軽視"], answer: 1, exp: "血糖値ばかりに注目して電解質・栄養を軽視すると容態が崩れる。全身を見続けることが重要。" },
+  { chapter: "第10章：総合", q: "DKA・膵炎管理で最終的に最も重要なのは？", options: ["血糖値の数字", "全身状態の継続的モニタリング"], answer: 1, exp: "数値ではなく患者全体を見る視点。電解質・意識・食欲・体重・尿量…全てが指標になる。" },
+];
+
+let questions = [];
+let currentIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let answered = false;
+let currentMode = 'all';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['all','chapter','random'][i] === mode);
+  });
+  const chNav = document.getElementById('chapterNav');
+  if (mode === 'chapter') {
+    chNav.style.display = 'flex';
+    document.getElementById('quizArea').innerHTML = '';
+    document.getElementById('scoreStrip').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('finalScreen').classList.remove('show');
+  } else {
+    chNav.style.display = 'none';
+    if (mode === 'all') startQuiz(ALL_QUESTIONS);
+    else startRandom();
+  }
+}
+
+function startChapter(idx) {
+  const chapters = [...new Set(ALL_QUESTIONS.map(q => q.chapter))];
+  const filtered = ALL_QUESTIONS.filter(q => q.chapter === chapters[idx]);
+  document.querySelectorAll('.chapter-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  startQuiz(filtered);
+}
+
+function startRandom() {
+  const shuffled = [...ALL_QUESTIONS].sort(() => Math.random()-0.5).slice(0,10);
+  startQuiz(shuffled);
+}
+
+function startQuiz(qs) {
+  questions = qs;
+  currentIndex = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('scoreCorrect').textContent = '0';
+  document.getElementById('scoreWrong').textContent = '0';
+  document.getElementById('scoreTotal').textContent = '0';
+  document.getElementById('finalScreen').classList.remove('show');
+  document.getElementById('scoreStrip').style.display = 'flex';
+  document.getElementById('progressWrap').style.display = 'block';
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentIndex >= questions.length) {
+    showFinal();
+    return;
+  }
+  answered = false;
+  const q = questions[currentIndex];
+  updateProgress();
+  const optLetters = ['A', 'B', 'C', 'D'];
+  const optHtml = q.options.map((opt, i) => `
+    <button class="option-btn" onclick="selectAnswer(${i})" id="opt${i}">
+      <span class="option-label">${optLetters[i]}</span>
+      <span>${opt}</span>
+    </button>
+  `).join('');
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="quiz-card">
+      <span class="chapter-badge">${q.chapter}</span>
+      <span class="q-number">Q${currentIndex + 1} / ${questions.length}</span>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optHtml}</div>
+      <div class="result-panel" id="resultPanel"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+      ${currentIndex + 1 < questions.length ? '次の問題へ →' : '結果を見る →'}
+    </button>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentIndex];
+  const correct = q.answer;
+  const isCorrect = idx === correct;
+  if (isCorrect) correctCount++;
+  else wrongCount++;
+  const total = correctCount + wrongCount;
+  document.getElementById('scoreCorrect').textContent = correctCount;
+  document.getElementById('scoreWrong').textContent = wrongCount;
+  document.getElementById('scoreTotal').textContent = total;
+
+  // Mark buttons
+  q.options.forEach((_, i) => {
+    const btn = document.getElementById('opt' + i);
+    btn.disabled = true;
+    if (i === correct) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // Show explanation
+  const panel = document.getElementById('resultPanel');
+  panel.classList.add('show');
+  panel.innerHTML = `
+    <div class="result-label ${isCorrect ? 'ok' : 'ng'}">
+      <span class="result-icon">${isCorrect ? '✓' : '✗'}</span>
+      ${isCorrect ? '正解！' : `不正解 — 正解は「${q.options[correct]}」`}
+    </div>
+    <div>${q.exp}</div>
+  `;
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  currentIndex++;
+  showQuestion();
+}
+
+function updateProgress() {
+  const pct = questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressCount').textContent = `${currentIndex} / ${questions.length}`;
+}
+
+function showFinal() {
+  document.getElementById('quizArea').innerHTML = '';
+  document.getElementById('scoreStrip').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  const pct = Math.round((correctCount / questions.length) * 100);
+  let color = pct >= 80 ? 'var(--correct)' : pct >= 60 ? 'var(--accent)' : 'var(--wrong)';
+  let grade = pct >= 90 ? '🏆 エキスパートレベル' : pct >= 80 ? '⭐ 合格ライン突破' : pct >= 60 ? '📚 もう少し復習を' : '🔄 基礎から見直し';
+  const fs = document.getElementById('finalScreen');
+  document.getElementById('finalScoreText').innerHTML = `<span style="color:${color}">${correctCount}</span><span style="font-size:0.4em;color:var(--text-muted)"> / ${questions.length}</span>`;
+  document.getElementById('finalGrade').innerHTML = `正答率 <span style="color:${color}">${pct}%</span>　${grade}`;
+  fs.classList.add('show');
+}
+
+function restart() {
+  document.getElementById('finalScreen').classList.remove('show');
+  setMode(currentMode);
+}
+
+// Start on load
+setMode('all');
+</script>
+
+</body>
+</html>
