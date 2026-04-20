@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>認知的不協和クイズ50問</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --ok: #16a34a;
+      --ng: #dc2626;
+      --border: #e5e7eb;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 40%, #f8fafc 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .container {
+      width: min(920px, calc(100% - 24px));
+      margin: 24px auto 60px;
+    }
+    .hero, .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      top: -50px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(37,99,235,0) 70%);
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(1.7rem, 3vw, 2.3rem); }
+    .lead { margin: 0; color: var(--muted); line-height: 1.8; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+    .card { padding: 24px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .progress-wrap { flex: 1 1 280px; }
+    .progress-label { font-size: 0.95rem; color: var(--muted); margin-bottom: 8px; }
+    .progress {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #60a5fa);
+      transition: width 0.35s ease;
+    }
+    .scorebox {
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      min-width: 180px;
+    }
+    .scorebox strong { display: block; font-size: 1rem; }
+    .question-no { color: var(--accent); font-weight: 800; margin-bottom: 10px; }
+    .question-text {
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+      font-weight: 800;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .choices { display: grid; gap: 12px; }
+    .choice {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 16px 18px;
+      border-radius: 16px;
+      font-size: 1rem;
+      line-height: 1.6;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+    .choice:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: #bfdbfe;
+      box-shadow: 0 8px 18px rgba(37,99,235,0.08);
+    }
+    .choice:disabled { cursor: default; }
+    .choice.correct {
+      border-color: rgba(22,163,74,0.45);
+      background: rgba(22,163,74,0.08);
+    }
+    .choice.wrong {
+      border-color: rgba(220,38,38,0.4);
+      background: rgba(220,38,38,0.08);
+    }
+    .feedback {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct { border-color: rgba(22,163,74,0.3); background: rgba(22,163,74,0.08); }
+    .feedback.wrong { border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.08); }
+    .feedback h2 {
+      margin: 0 0 10px;
+      font-size: 1.12rem;
+    }
+    .feedback p {
+      margin: 8px 0;
+      line-height: 1.85;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn.primary { background: var(--accent); color: white; }
+    .btn.secondary { background: #e5e7eb; color: #111827; }
+    .btn.ghost { background: transparent; border: 1px solid var(--border); color: #111827; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .result {
+      text-align: center;
+      display: none;
+      padding: 12px 6px 4px;
+    }
+    .result.show { display: block; }
+    .result h2 { font-size: clamp(1.6rem, 3vw, 2rem); margin: 0 0 12px; }
+    .big-score {
+      font-size: clamp(2.3rem, 6vw, 4rem);
+      font-weight: 900;
+      color: var(--accent);
+      margin: 12px 0;
+    }
+    .summary {
+      margin: 0 auto 18px;
+      max-width: 680px;
+      line-height: 1.9;
+      color: var(--muted);
+    }
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.7;
+    }
+    #petals, #rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 20;
+    }
+    .petal, .drop {
+      position: absolute;
+      top: -10vh;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    .petal {
+      width: 14px;
+      height: 10px;
+      background: #f9a8d4;
+      border-radius: 12px 2px 12px 2px;
+      opacity: 0.85;
+      animation-name: fallPetal;
+    }
+    .drop {
+      width: 2px;
+      height: 22px;
+      background: linear-gradient(180deg, rgba(59,130,246,0.1), rgba(59,130,246,0.65));
+      border-radius: 999px;
+      animation-name: fallRain;
+    }
+    @keyframes fallPetal {
+      to {
+        transform: translate3d(var(--dx), 110vh, 0) rotate(560deg);
+        opacity: 0.2;
+      }
+    }
+    @keyframes fallRain {
+      to {
+        transform: translate3d(var(--dx), 110vh, 0);
+        opacity: 0.25;
+      }
+    }
+    @media (max-width: 640px) {
+      .hero, .card { padding: 18px; border-radius: 18px; }
+      .choice { padding: 14px; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="petals"></div>
+  <div id="rain"></div>
+  <div class="container">
+    <section class="hero">
+      <h1>認知的不協和クイズ 50問</h1>
+      <p class="lead">
+        フェスティンガーの強制的承諾実験を中心に、認知的不協和の定義、外的正当化、内的正当化、態度変容、応用までを3択で確認する学習アプリです。
+      </p>
+      <div class="meta">
+        <span class="badge">全50問</span>
+        <span class="badge">3択</span>
+        <span class="badge">解答＋解説つき</span>
+        <span class="badge">スマホ対応</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="quizArea">
+        <div class="topbar">
+          <div class="progress-wrap">
+            <div class="progress-label" id="progressLabel">進捗 0 / 50</div>
+            <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+          </div>
+          <div class="scorebox">
+            <strong id="scoreText">正解 0 / 0</strong>
+            <span id="rateText" class="lead">正答率 0%</span>
+          </div>
+        </div>
+
+        <div class="question-no" id="questionNo"></div>
+        <div class="question-text" id="questionText"></div>
+        <div class="choices" id="choices"></div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="actions">
+          <button class="btn ghost" id="restartBtn">最初からやり直す</button>
+          <button class="btn primary" id="nextBtn" disabled>次の問題へ</button>
+        </div>
+      </div>
+
+      <div class="result" id="resultArea">
+        <h2>おつかれさまでした</h2>
+        <div class="big-score" id="finalScore"></div>
+        <p class="summary" id="summaryText"></p>
+        <div class="actions" style="justify-content:center;">
+          <button class="btn primary" id="retryBtn">もう一度解く</button>
+        </div>
+      </div>
+
+      <p class="footer-note">
+        この教材は、フェスティンガーの「つまらない作業を楽しいと伝えさせる」古典的実験の理解補助として作成されています。教育用途を想定した整理であり、厳密な論文抄訳ではありません。
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "認知的不協和とは何を指す概念ですか。",
+        choices: [
+          "同時に存在する認知同士が互いに矛盾し、心理的緊張が生じる状態",
+          "記憶力が低下して情報が保持できない状態",
+          "複数の感情があるため判断不能になる状態"
+        ],
+        answer: 0,
+        explanation: "認知的不協和は、信念・態度・行動などの認知要素同士が整合せず、内的緊張が生じる状態を指します。"
+      },
+      {
+        q: "フェスティンガーの実験で参加者が最初に行ったのは何ですか。",
+        choices: [
+          "楽しいゲームを協力して行った",
+          "単調でつまらない作業を行った",
+          "自由討論で意見交換をした"
+        ],
+        answer: 1,
+        explanation: "この実験では、参加者に退屈で単調な課題を実施させ、その後の態度変化を測定しました。"
+      },
+      {
+        q: "その後、参加者に求められた行動として正しいものはどれですか。",
+        choices: [
+          "次の参加者に作業は楽しいと伝えること",
+          "実験の欠点を批判すること",
+          "課題の難易度を点数化すること"
+        ],
+        answer: 0,
+        explanation: "本当は退屈だと体験した作業について、次の学生に『楽しい』と伝えさせた点がこの実験の核心です。"
+      },
+      {
+        q: "この実験で生じた中心的な矛盾は何ですか。",
+        choices: [
+          "作業はつまらないと感じたのに、楽しいと話したこと",
+          "作業が難しいのに簡単だと答えたこと",
+          "報酬が多いのに少ないと感じたこと"
+        ],
+        answer: 0,
+        explanation: "認知的不協和は『つまらないと感じた』という認知と『楽しいと伝えた』という行動との矛盾にあります。"
+      },
+      {
+        q: "高額報酬群と低額報酬群を比較したとき、より強い態度変化を示したのはどちらでしたか。",
+        choices: [
+          "高額報酬群",
+          "低額報酬群",
+          "両群で差はなかった"
+        ],
+        answer: 1,
+        explanation: "低額報酬群のほうが、作業を『実はそれほど悪くなかった』と再評価する傾向が強くなりました。"
+      },
+      {
+        q: "低額報酬群で態度変化が大きくなった主因は何ですか。",
+        choices: [
+          "外的正当化が弱く、内的に整合化する必要が高かったから",
+          "高額報酬群より作業時間が長かったから",
+          "実験内容を事前に知っていたから"
+        ],
+        answer: 0,
+        explanation: "報酬が小さいと『お金のためにそう言った』という説明が弱くなるため、自分の態度を変えて不協和を減らしやすくなります。"
+      },
+      {
+        q: "この実験でいう『外的正当化』に最も近いものはどれですか。",
+        choices: [
+          "自分の価値観を変えること",
+          "行動の理由を報酬など外部要因で説明すること",
+          "記憶を改ざんしてしまうこと"
+        ],
+        answer: 1,
+        explanation: "外的正当化とは、『高い報酬をもらったからそう言った』のように外部要因で自分の行動を説明することです。"
+      },
+      {
+        q: "この実験でいう『内的正当化』に最も近いものはどれですか。",
+        choices: [
+          "自分の態度や信念を変えて整合性をとること",
+          "実験者の圧力に従うこと",
+          "他人の評価に合わせること"
+        ],
+        answer: 0,
+        explanation: "内的正当化では、自分の認知そのものを修正して『意外と楽しかったのかもしれない』と整合性を回復します。"
+      },
+      {
+        q: "高額報酬群が態度をあまり変えずに済んだのはなぜですか。",
+        choices: [
+          "外部から十分な理由づけが与えられていたから",
+          "作業自体が本当に楽しかったから",
+          "低額報酬群より賢かったから"
+        ],
+        answer: 0,
+        explanation: "十分な報酬という外的理由があると、行動と内面のズレを態度変更なしで処理しやすくなります。"
+      },
+      {
+        q: "認知的不協和理論において、人は一般に何を志向すると考えられますか。",
+        choices: [
+          "矛盾を増やすこと",
+          "認知の整合性を保つこと",
+          "常に他者に従うこと"
+        ],
+        answer: 1,
+        explanation: "理論の前提は、人が整合的で一貫した認知状態を好み、不整合を減らそうとする点にあります。"
+      },
+      {
+        q: "『つまらない作業だった』という体験は、この実験では何に当たりますか。",
+        choices: [
+          "実験操作ではなく無関係なノイズ",
+          "参加者のもつ一つの認知",
+          "報酬の代替物"
+        ],
+        answer: 1,
+        explanation: "実際の体験に基づく評価は参加者の認知の一つであり、その後の発言と矛盾して不協和を生みます。"
+      },
+      {
+        q: "『作業は楽しいと伝えた』という事実は、この実験では何に当たりますか。",
+        choices: [
+          "行動としての認知要素",
+          "単なる測定誤差",
+          "課題と無関係な雑音"
+        ],
+        answer: 0,
+        explanation: "認知的不協和理論では、行動そのものも自己に関する認知として機能し、態度と衝突しうると考えます。"
+      },
+      {
+        q: "低額報酬群が『意外と悪くなかった』と感じやすくなるのは、主に何を減らすためですか。",
+        choices: [
+          "身体的疲労",
+          "心理的緊張",
+          "作業時間"
+        ],
+        answer: 1,
+        explanation: "矛盾した認知が同時に存在すると心理的緊張が高まるため、それを軽減する方向に態度が変化します。"
+      },
+      {
+        q: "この実験が示した重要なポイントとして最も適切なのはどれですか。",
+        choices: [
+          "報酬は高いほど必ず態度を変える",
+          "十分な外的理由がない行動ほど、内面の態度が変わりやすい",
+          "つまらない作業でも全員が好きになる"
+        ],
+        answer: 1,
+        explanation: "この実験は、不十分な外的正当化の下で行動すると、その行動に合わせて態度が変わりやすいことを示しました。"
+      },
+      {
+        q: "『自分はこんな少額のために嘘をつく人間なのか』という感覚は、何の表れと考えられますか。",
+        choices: [
+          "認知的不協和による自己評価の揺らぎ",
+          "単なる記憶障害",
+          "実験手続きの失敗"
+        ],
+        answer: 0,
+        explanation: "自己概念と実際の行動が噛み合わないとき、不協和は自己評価の違和感としても表れます。"
+      },
+      {
+        q: "この実験で報酬の違いは何を操作するために使われましたか。",
+        choices: [
+          "作業速度",
+          "外的正当化の強さ",
+          "知能水準"
+        ],
+        answer: 1,
+        explanation: "報酬額は、行動を外的要因でどの程度説明できるか、すなわち外的正当化の強さを変えるための操作です。"
+      },
+      {
+        q: "低額報酬群で『楽しい』評価が上がる現象は、どの方向の変化ですか。",
+        choices: [
+          "行動に態度を合わせる方向の変化",
+          "態度に行動を合わせる方向の変化",
+          "報酬を増やす方向の変化"
+        ],
+        answer: 0,
+        explanation: "すでに行ってしまった行動に合わせて、後から態度が変化することがこの実験の特徴です。"
+      },
+      {
+        q: "高額報酬群が『お金のためにそう言っただけ』と考えるのは何に該当しますか。",
+        choices: [
+          "外的要因による説明",
+          "内的価値の強化",
+          "記憶の消去"
+        ],
+        answer: 0,
+        explanation: "報酬という外的理由を用いて行動を説明しているため、これは外的正当化に当たります。"
+      },
+      {
+        q: "認知的不協和の解消方法として典型的でないものはどれですか。",
+        choices: [
+          "態度を変える",
+          "行動の意味づけを変える",
+          "必ず他人を責める"
+        ],
+        answer: 2,
+        explanation: "不協和低減には態度変更、認知の追加、意味づけ変更などがありますが、他人を責めることが必須ではありません。"
+      },
+      {
+        q: "この実験を『強制的承諾』の実験と呼ぶ理由として最も適切なのはどれですか。",
+        choices: [
+          "参加者が一定の方向の発言を求められたから",
+          "作業を拒否できなかったから",
+          "高額報酬を断れなかったから"
+        ],
+        answer: 0,
+        explanation: "参加者は、本来の感想とは異なる『楽しい』という発言をするよう求められ、その承諾が問題になっています。"
+      },
+      {
+        q: "この理論で『不協和が大きい』とはどういう意味ですか。",
+        choices: [
+          "認知間の矛盾が大きく、緊張も強いこと",
+          "作業の音がうるさいこと",
+          "報酬が高いこと"
+        ],
+        answer: 0,
+        explanation: "不協和の大きさは、矛盾する認知の重要度や比率に応じて増減すると考えられます。"
+      },
+      {
+        q: "次のうち、この実験のB群に最も近い状態はどれですか。",
+        choices: [
+          "大きな見返りがあるので本心と違うことを言う",
+          "ほとんど見返りがないのに本心と違うことを言う",
+          "本心どおりのことをそのまま言う"
+        ],
+        answer: 1,
+        explanation: "B群では外的報酬が乏しいため、『なぜそんなことを言ったのか』を内面で整合化する必要が高くなります。"
+      },
+      {
+        q: "態度変容が生じたかどうかをみる際、研究者が注目したのは何ですか。",
+        choices: [
+          "その後の作業評価",
+          "身長体重の変化",
+          "睡眠時間"
+        ],
+        answer: 0,
+        explanation: "後続の評価で、参加者がその作業をどれほど面白い・価値があると見なしたかが主要な指標となります。"
+      },
+      {
+        q: "『本当は嫌だったが、自分で選んだことだから意味があると思うようになる』という現象は何に近いですか。",
+        choices: [
+          "認知的不協和の低減",
+          "単純な忘却",
+          "感覚順応"
+        ],
+        answer: 0,
+        explanation: "自分の行動と態度のズレを埋めるために意味づけや評価が変化するのは、不協和低減の典型例です。"
+      },
+      {
+        q: "この実験から導かれる示唆として、強い外的報酬は何を起こしやすいですか。",
+        choices: [
+          "態度変化を不要にする",
+          "必ず強い内的納得を生む",
+          "不協和を増大させ続ける"
+        ],
+        answer: 0,
+        explanation: "強い外的報酬があれば、行動の理由を外に置けるため、態度まで変更する必要が小さくなります。"
+      },
+      {
+        q: "認知的不協和理論で、人が情報を追加して不協和を減らす場合の例として適切なのはどれですか。",
+        choices: [
+          "『作業はつまらないが、研究の役には立った』と考える",
+          "『作業はつまらない』と思った事実を消す",
+          "『報酬はなかった』と事実を改変する"
+        ],
+        answer: 0,
+        explanation: "新たな整合的認知を追加することも不協和低減の一つです。意味づけの付加は典型的な方法です。"
+      },
+      {
+        q: "『自分の行動から自分の態度を推測する』という説明は、どの理論と関連が深いですか。",
+        choices: [
+          "自己知覚理論",
+          "古典的条件づけ",
+          "流動性知能理論"
+        ],
+        answer: 0,
+        explanation: "Bemの自己知覚理論は、特に外的手がかりが弱いとき、自分の行動から態度を推測する過程を説明します。"
+      },
+      {
+        q: "ただしフェスティンガーの実験を説明する中心理論として一般に扱われるのはどれですか。",
+        choices: [
+          "認知的不協和理論",
+          "進化心理学のみ",
+          "気質理論のみ"
+        ],
+        answer: 0,
+        explanation: "古典的にはこの実験は認知的不協和理論の代表的エビデンスとして紹介されます。"
+      },
+      {
+        q: "次のうち、低額報酬群で起きやすい心の動きとして最も適切なのはどれですか。",
+        choices: [
+          "『仕方なかった』よりも『案外面白かった』へ寄る",
+          "『高い給料だから当然だ』と考える",
+          "『実験の存在を忘れる』だけで終わる"
+        ],
+        answer: 0,
+        explanation: "外的な説明が弱いため、体験の評価そのものを少し持ち上げる方向に内的調整が起きやすくなります。"
+      },
+      {
+        q: "この実験の理屈を一言で表すなら、最も近いのはどれですか。",
+        choices: [
+          "理由が弱い行動ほど、考え方を変えて辻褄を合わせやすい",
+          "報酬が多いほど必ず好きになる",
+          "退屈な作業は何度もやれば好きになる"
+        ],
+        answer: 0,
+        explanation: "まさに『不十分な正当化』が態度変容を引き起こす、という点がこの実験の要約です。"
+      },
+      {
+        q: "この実験でB群の報酬が高額だったら、予測される結果として最も妥当なのはどれですか。",
+        choices: [
+          "現在より態度変化は小さくなる可能性が高い",
+          "必ずもっと好きになる",
+          "結果は理論上まったく変わらない"
+        ],
+        answer: 0,
+        explanation: "報酬が増えると外的正当化が強まるため、態度変容の必要性は通常小さくなります。"
+      },
+      {
+        q: "認知的不協和の『認知』に含まれるものとして適切なのはどれですか。",
+        choices: [
+          "信念、態度、知識、行動についての自己認識",
+          "脈拍だけ",
+          "筋力だけ"
+        ],
+        answer: 0,
+        explanation: "理論上の認知には、考え、価値観、態度、行動についての認識など幅広い要素が含まれます。"
+      },
+      {
+        q: "『作業は退屈だ』と『私は楽しいと話した』が同時に成り立つとき、何が増えるとされますか。",
+        choices: [
+          "心理的な不快感や緊張",
+          "運動能力",
+          "聴力"
+        ],
+        answer: 0,
+        explanation: "相互に矛盾する認知が共存すると、不快感や緊張が増し、それを減らそうとする動機づけが生じます。"
+      },
+      {
+        q: "認知的不協和理論の観点から、なぜ人は自分の嘘を信じ始めることがあるのですか。",
+        choices: [
+          "矛盾を減らすために態度を調整するから",
+          "必ず記憶障害が起こるから",
+          "他人に命令された内容は真実になるから"
+        ],
+        answer: 0,
+        explanation: "自己の行動と内面のズレを埋めるため、発した内容に態度が近づいていくことがあります。"
+      },
+      {
+        q: "この実験の参加者が本当に感じていた作業評価と、他者に伝えた内容が一致しないことは何を生みますか。",
+        choices: [
+          "不協和",
+          "強化子",
+          "条件反射"
+        ],
+        answer: 0,
+        explanation: "体験と発言の不一致は、そのまま認知的不協和の構造です。"
+      },
+      {
+        q: "ビジネスや教育の場面でこの理論を応用する場合、より内面化を促しやすいのはどれですか。",
+        choices: [
+          "過剰な外的報酬だけで動かすこと",
+          "自分で選んだ感覚を伴う小さなコミットメント",
+          "意味を説明せずに命令だけすること"
+        ],
+        answer: 1,
+        explanation: "自発的選択や小さな自己決定は、行動と自己概念の整合化を通じて内面化を促しやすいと考えられます。"
+      },
+      {
+        q: "『一度引き受けた以上、きっと価値があるのだろう』という思考は何に近いですか。",
+        choices: [
+          "不協和低減のための再解釈",
+          "統計的検定",
+          "知覚恒常性"
+        ],
+        answer: 0,
+        explanation: "すでに取った行動の価値を高めて解釈し直すことは、不協和を減らす典型的な再解釈です。"
+      },
+      {
+        q: "高額報酬群において『私は報酬のためにそう言った』と考えることの機能は何ですか。",
+        choices: [
+          "行動と自己像のズレを外部理由で埋めること",
+          "作業をより楽しく感じること",
+          "他者評価を高めること"
+        ],
+        answer: 0,
+        explanation: "外部理由づけは、自分の内的態度を変えずに矛盾を説明する役割を果たします。"
+      },
+      {
+        q: "『不十分な正当化』という表現が指すのはどれですか。",
+        choices: [
+          "行動を説明する外的理由が弱いこと",
+          "作業が長すぎること",
+          "質問紙の項目が少ないこと"
+        ],
+        answer: 0,
+        explanation: "低額報酬のように外的理由が弱い状況では、内面の態度変化によって整合性を回復しやすくなります。"
+      },
+      {
+        q: "認知的不協和理論で、矛盾する認知のうち重要性が高いほどどうなると考えられますか。",
+        choices: [
+          "不協和は小さくなる",
+          "不協和は大きくなりやすい",
+          "理論の対象外になる"
+        ],
+        answer: 1,
+        explanation: "自己概念や重要な価値に関わる認知ほど、矛盾した際の不協和は強くなりやすいと考えられます。"
+      },
+      {
+        q: "この実験の結果を『人は必ず嘘を真実と思い込む』と一般化するのが不適切な理由はどれですか。",
+        choices: [
+          "態度変化は条件つきで起こり、常に同じ強さで生じるわけではないから",
+          "嘘という言葉が使えないから",
+          "報酬の概念が存在しないから"
+        ],
+        answer: 0,
+        explanation: "不協和低減は状況依存的であり、外的正当化、自己関与、自由選択などの条件に影響されます。"
+      },
+      {
+        q: "フェスティンガーの実験を理解するうえで、最も重要な比較軸はどれですか。",
+        choices: [
+          "作業環境の照明の差",
+          "報酬が行動の外的理由として十分か不十分か",
+          "参加者の服装の差"
+        ],
+        answer: 1,
+        explanation: "本質は報酬額そのものではなく、その報酬が行動を正当化するのに十分かどうかです。"
+      },
+      {
+        q: "この理論において、態度変化が『自己防衛』的に見えるのはなぜですか。",
+        choices: [
+          "矛盾した自己像をそのままにしたくないから",
+          "常に他人と競争しているから",
+          "実験者に褒められたいから"
+        ],
+        answer: 0,
+        explanation: "人は自分を一貫した存在として保ちたい傾向があり、態度変化はその整合性を守る働きを持ちます。"
+      },
+      {
+        q: "『つまらない作業』があとから『それほど悪くなかった』に変わるのは、主として何が変わったからですか。",
+        choices: [
+          "客観的作業内容",
+          "参加者の主観的評価",
+          "報酬の支払い事実"
+        ],
+        answer: 1,
+        explanation: "実際の作業内容は同じでも、認知的不協和を減らすために主観的評価が変化する点が重要です。"
+      },
+      {
+        q: "この実験が『態度は行動の後からでも変わる』ことを示すとされるのはなぜですか。",
+        choices: [
+          "先に発生した行動に合わせて後続の評価が変化したから",
+          "最初から態度が決まっていたから",
+          "報酬が態度そのものだったから"
+        ],
+        answer: 0,
+        explanation: "退屈な作業を経験し、その後に『楽しい』と述べる行動をしたのち、作業評価が変わる点が示唆的です。"
+      },
+      {
+        q: "次のうち、認知的不協和の例として最も適切なのはどれですか。",
+        choices: [
+          "健康が大事だと思いながら喫煙を続ける",
+          "運動が好きで毎日走っている",
+          "甘い物が好きでケーキを食べる"
+        ],
+        answer: 0,
+        explanation: "価値観と行動が食い違う場面は、認知的不協和の典型例として扱われます。"
+      },
+      {
+        q: "この古典的実験の教育的意義として適切なのはどれですか。",
+        choices: [
+          "人間が自分の行動に合わせて信念を調整しうることを示した",
+          "報酬が高いほど学習効率が上がると証明した",
+          "退屈な作業は必ず楽しいと感じると示した"
+        ],
+        answer: 0,
+        explanation: "この実験の核心は、行動と認知の整合性回復のために態度が変わりうるという点にあります。"
+      },
+      {
+        q: "『認知的不協和は“状況”ではなく“頭の中の矛盾”である』という説明の意味として最も適切なのはどれですか。",
+        choices: [
+          "同じ状況でも、どう解釈するかで不協和の大きさが変わりうる",
+          "状況は心理に一切影響しない",
+          "頭の大きさで決まる"
+        ],
+        answer: 0,
+        explanation: "外部状況そのものより、その状況をどう認知し、どの認知同士が矛盾しているかが重要です。"
+      },
+      {
+        q: "『報酬が割に合わないのに、楽しいと語らなければならない』というB群の特徴は何を増大させますか。",
+        choices: [
+          "外的正当化の強さ",
+          "不協和低減の必要性",
+          "作業の客観的難度"
+        ],
+        answer: 1,
+        explanation: "低額報酬により外的説明が弱いため、不協和を内面調整で減らす必要が高くなります。"
+      },
+      {
+        q: "A群とB群の違いを最も端的に表すならどれですか。",
+        choices: [
+          "A群は外的理由が強く、B群は外的理由が弱い",
+          "A群は知能が高く、B群は知能が低い",
+          "A群は作業が簡単で、B群は作業が難しい"
+        ],
+        answer: 0,
+        explanation: "差の本質は参加者特性ではなく、行動をどれだけ外的に説明できるかにあります。"
+      },
+      {
+        q: "もし参加者が最初から『実験だから本心と違うことを言っても構わない』と強く納得していたら、どうなる可能性がありますか。",
+        choices: [
+          "不協和は弱まり、態度変化も小さくなる可能性がある",
+          "必ず不協和が強まる",
+          "実験結果は逆転して高額群だけ変化する"
+        ],
+        answer: 0,
+        explanation: "別の十分な認知的理由があれば、行動の整合化を態度変更で行う必要は小さくなります。"
+      },
+      {
+        q: "この実験を通じて学ぶべき重要な実務的教訓として最も適切なのはどれですか。",
+        choices: [
+          "人は自ら引き受けた行動の意味を後から高めることがある",
+          "人はお金をもらうと必ず本心を失う",
+          "退屈な業務は報酬をゼロにすると好きになる"
+        ],
+        answer: 0,
+        explanation: "自分で行った行動に合わせて意味づけや態度を再編する傾向は、教育、営業、組織運営でも重要な示唆を持ちます。"
+      },
+      {
+        q: "『高い報酬を払えば本心と違う行動でも十分説明できる』という考え方は、この実験では何の説明に使われますか。",
+        choices: [
+          "A群で大きな態度変化が起きにくい理由",
+          "B群で態度変化が大きい理由",
+          "作業が退屈だった理由"
+        ],
+        answer: 0,
+        explanation: "高い報酬があると、行動を外的に説明できるため、態度の書き換えは起きにくくなります。"
+      },
+      {
+        q: "この実験を最も誤って理解している記述はどれですか。",
+        choices: [
+          "低報酬では態度変化が起こりうる",
+          "報酬は外的正当化の強さに関係する",
+          "認知的不協和とは単にお金が少なくて不満なことだ"
+        ],
+        answer: 2,
+        explanation: "不協和は『金額への不満』そのものではなく、認知同士の矛盾から生じる心理的緊張です。"
+      },
+      {
+        q: "フェスティンガーの実験を理解する際、最終的に注目すべき核心はどれですか。",
+        choices: [
+          "人は矛盾を抱えると、そのまま放置するとは限らず、態度を調整して整合性を回復しようとする",
+          "人は報酬があれば何でも好きになる",
+          "人は常に他人に合わせて発言する"
+        ],
+        answer: 0,
+        explanation: "この理論の中心は、人が矛盾した認知を減らし、自己の整合性を回復しようとする動機づけにあります。"
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionNo = document.getElementById('questionNo');
+    const questionText = document.getElementById('questionText');
+    const choicesEl = document.getElementById('choices');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('nextBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressBar = document.getElementById('progressBar');
+    const scoreText = document.getElementById('scoreText');
+    const rateText = document.getElementById('rateText');
+    const quizArea = document.getElementById('quizArea');
+    const resultArea = document.getElementById('resultArea');
+    const finalScore = document.getElementById('finalScore');
+    const summaryText = document.getElementById('summaryText');
+
+    function updateStats() {
+      progressLabel.textContent = `進捗 ${Math.min(current + 1, questions.length)} / ${questions.length}`;
+      const answeredCount = current;
+      const rate = answeredCount === 0 ? 0 : Math.round((score / answeredCount) * 100);
+      scoreText.textContent = `正解 ${score} / ${answeredCount}`;
+      rateText.textContent = `正答率 ${rate}%`;
+      progressBar.style.width = `${(current / questions.length) * 100}%`;
+    }
+
+    function renderQuestion() {
+      const item = questions[current];
+      answered = false;
+      nextBtn.disabled = true;
+      feedback.className = 'feedback';
+      feedback.innerHTML = '';
+      questionNo.textContent = `第 ${current + 1} 問`;
+      questionText.textContent = item.q;
+      progressLabel.textContent = `進捗 ${current + 1} / ${questions.length}`;
+      progressBar.style.width = `${(current / questions.length) * 100}%`;
+      choicesEl.innerHTML = '';
+
+      item.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}.</strong> ${choice}`;
+        btn.addEventListener('click', () => selectAnswer(idx));
+        choicesEl.appendChild(btn);
+      });
+      updateStats();
+    }
+
+    function selectAnswer(index) {
+      if (answered) return;
+      answered = true;
+      const item = questions[current];
+      const buttons = [...document.querySelectorAll('.choice')];
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === item.answer) btn.classList.add('correct');
+        if (idx === index && idx !== item.answer) btn.classList.add('wrong');
+      });
+
+      const correct = index === item.answer;
+      if (correct) {
+        score += 1;
+        playCorrectSound();
+        launchPetals();
+      } else {
+        playWrongSound();
+        launchRain();
+      }
+
+      feedback.className = `feedback show ${correct ? 'correct' : 'wrong'}`;
+      feedback.innerHTML = `
+        <h2>${correct ? '正解です' : '不正解です'}</h2>
+        <p><strong>解答：</strong>${String.fromCharCode(65 + item.answer)}. ${item.choices[item.answer]}</p>
+        <p><strong>解説：</strong>${item.explanation}</p>
+      `;
+
+      const answeredCount = current + 1;
+      const rate = Math.round((score / answeredCount) * 100);
+      scoreText.textContent = `正解 ${score} / ${answeredCount}`;
+      rateText.textContent = `正答率 ${rate}%`;
+      progressBar.style.width = `${(answeredCount / questions.length) * 100}%`;
+      nextBtn.disabled = false;
+      nextBtn.textContent = current === questions.length - 1 ? '結果を見る' : '次の問題へ';
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+      current += 1;
+      if (current >= questions.length) {
+        showResult();
+        return;
+      }
+      renderQuestion();
+    }
+
+    function showResult() {
+      quizArea.style.display = 'none';
+      resultArea.classList.add('show');
+      const rate = Math.round((score / questions.length) * 100);
+      finalScore.textContent = `${score} / ${questions.length} 問正解`;
+      let comment = '';
+      if (rate >= 90) {
+        comment = '認知的不協和の理論構造、外的正当化と内的正当化、古典的実験の読解がかなり整理されています。教育・実務応用まで十分見通せる水準です。';
+      } else if (rate >= 75) {
+        comment = '主要概念はよく理解できています。とくに「なぜ低額報酬群のほうが態度変化しやすいのか」をもう一度確認すると、理解がさらに締まります。';
+      } else if (rate >= 60) {
+        comment = '基礎はつかめています。『不協和は状況ではなく認知の矛盾にある』『高額報酬は外的正当化になる』の2点を復習すると伸びます。';
+      } else {
+        comment = 'まずは、①つまらない作業 ②楽しいと話す ③低額報酬では外的理由が弱い、の3点を一直線で結び直すと理解しやすくなります。';
+      }
+      summaryText.textContent = `正答率 ${rate}%。${comment}`;
+    }
+
+    function resetQuiz() {
+      current = 0;
+      score = 0;
+      answered = false;
+      quizArea.style.display = 'block';
+      resultArea.classList.remove('show');
+      nextBtn.textContent = '次の問題へ';
+      updateStats();
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function playTone(freq, duration, type='sine', volume=0.04) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.stop(ctx.currentTime + duration);
+      setTimeout(() => ctx.close(), duration * 1000 + 120);
+    }
+
+    function playCorrectSound() {
+      playTone(880, 0.12, 'triangle', 0.05);
+      setTimeout(() => playTone(1174.66, 0.18, 'triangle', 0.05), 90);
+    }
+
+    function playWrongSound() {
+      playTone(220, 0.16, 'sawtooth', 0.05);
+      setTimeout(() => playTone(164.81, 0.22, 'sawtooth', 0.05), 110);
+    }
+
+    function launchPetals() {
+      const wrap = document.getElementById('petals');
+      for (let i = 0; i < 24; i++) {
+        const el = document.createElement('span');
+        el.className = 'petal';
+        el.style.left = `${Math.random() * 100}vw`;
+        el.style.animationDuration = `${2.6 + Math.random() * 1.8}s`;
+        el.style.setProperty('--dx', `${-80 + Math.random() * 160}px`);
+        el.style.opacity = `${0.55 + Math.random() * 0.35}`;
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 4600);
+      }
+    }
+
+    function launchRain() {
+      const wrap = document.getElementById('rain');
+      for (let i = 0; i < 32; i++) {
+        const el = document.createElement('span');
+        el.className = 'drop';
+        el.style.left = `${Math.random() * 100}vw`;
+        el.style.animationDuration = `${0.8 + Math.random() * 0.6}s`;
+        el.style.setProperty('--dx', `${-30 + Math.random() * 30}px`);
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 1800);
+      }
+    }
+
+    nextBtn.addEventListener('click', nextQuestion);
+    restartBtn.addEventListener('click', resetQuiz);
+    retryBtn.addEventListener('click', resetQuiz);
+
+    renderQuestion();
+  </script>
+</body>
+</html>
