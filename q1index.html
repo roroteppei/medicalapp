@@ -1,1 +1,560 @@
 
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>犬・猫 エネルギー必要量計算</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.07);
+    --text: #e2e8f0;
+    --muted: #475569;
+    --dim: #334155;
+
+```
+--dog: #E07A3A;
+--dog-glow: rgba(224,122,58,0.25);
+--dog-dim: #7a3a10;
+--cat: #5B8FC9;
+--cat-glow: rgba(91,143,201,0.25);
+--cat-dim: #1e3a60;
+
+--accent: var(--dog);
+--glow: var(--dog-glow);
+```
+
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+min-height: 100vh;
+padding: 32px 16px 48px;
+display: flex;
+flex-direction: column;
+align-items: center;
+background-image:
+radial-gradient(ellipse at 20% 10%, rgba(91,143,201,0.07) 0%, transparent 50%),
+radial-gradient(ellipse at 80% 80%, rgba(224,122,58,0.07) 0%, transparent 50%);
+}
+
+/* ── Header ── */
+header {
+text-align: center;
+margin-bottom: 28px;
+animation: fadeDown 0.5s ease both;
+}
+.eyebrow {
+font-size: 10px;
+letter-spacing: 0.3em;
+color: var(–muted);
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+h1 {
+font-family: ‘DM Serif Display’, serif;
+font-size: 26px;
+font-weight: 400;
+color: #f1f5f9;
+letter-spacing: 0.02em;
+}
+.subtitle { font-size: 11px; color: var(–dim); margin-top: 4px; }
+
+/* ── Card ── */
+.card {
+width: 100%; max-width: 460px;
+background: var(–surface);
+border-radius: 20px;
+border: 1px solid var(–border);
+padding: 24px 20px;
+box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+animation: fadeUp 0.5s ease 0.1s both;
+}
+
+/* ── Species Toggle ── */
+.toggle-wrap {
+display: flex;
+background: rgba(0,0,0,0.35);
+border-radius: 12px;
+padding: 4px;
+margin-bottom: 22px;
+gap: 4px;
+}
+.toggle-btn {
+flex: 1; padding: 10px 0;
+border-radius: 9px; border: none;
+cursor: pointer; font-family: inherit;
+font-size: 14px; font-weight: 500;
+background: transparent; color: var(–muted);
+transition: all 0.2s;
+}
+.toggle-btn.active-dog  { background: var(–dog); color: #fff; font-weight: 600; }
+.toggle-btn.active-cat  { background: var(–cat); color: #fff; font-weight: 600; }
+
+/* ── Field ── */
+.field { margin-bottom: 16px; }
+.field-label {
+display: block;
+font-size: 10px; color: var(–muted);
+letter-spacing: 0.18em; text-transform: uppercase;
+margin-bottom: 7px;
+}
+input, select {
+width: 100%; padding: 11px 14px;
+border-radius: 10px;
+border: 1px solid rgba(255,255,255,0.09);
+background: rgba(0,0,0,0.28);
+color: #f1f5f9; font-size: 15px;
+font-family: inherit; outline: none;
+transition: border 0.2s;
+}
+input:focus, select:focus {
+border-color: var(–accent);
+box-shadow: 0 0 0 3px var(–glow);
+}
+input::placeholder { color: var(–dim); font-size: 13px; }
+select { cursor: pointer; font-size: 13px; background: rgba(8,12,22,0.92); }
+select option { background: #0d1117; }
+
+/* ── Radio-style buttons ── */
+.btn-group { display: flex; gap: 8px; }
+.radio-btn {
+flex: 1; padding: 10px 0;
+border-radius: 9px;
+border: 1px solid rgba(255,255,255,0.09);
+background: rgba(0,0,0,0.2);
+color: var(–muted); font-size: 13px;
+cursor: pointer; font-family: inherit;
+transition: all 0.2s; font-weight: 400;
+}
+.radio-btn.active {
+border: 2px solid var(–accent);
+background: rgba(255,255,255,0.05);
+color: var(–accent); font-weight: 600;
+}
+
+/* ── BCS ── */
+.bcs-group { display: flex; gap: 6px; }
+.bcs-btn {
+flex: 1; padding: 9px 0;
+border-radius: 9px;
+border: 1px solid rgba(255,255,255,0.09);
+background: rgba(0,0,0,0.2);
+color: var(–muted); font-size: 15px;
+cursor: pointer; font-family: inherit;
+transition: all 0.2s;
+}
+.bcs-btn.active {
+border: 2px solid var(–accent);
+background: rgba(255,255,255,0.05);
+color: var(–accent); font-weight: 700;
+}
+.bcs-note { font-size: 10px; color: var(–dim); margin-top: 5px; text-align: center; }
+
+/* ── Calculate Button ── */
+.calc-btn {
+width: 100%; margin-top: 20px;
+padding: 14px 0; border-radius: 12px;
+border: none; cursor: pointer;
+font-family: ‘DM Serif Display’, serif;
+font-size: 16px; letter-spacing: 0.08em;
+color: #fff;
+background: linear-gradient(135deg, var(–dog), var(–dog-dim));
+box-shadow: 0 4px 20px var(–dog-glow);
+transition: opacity 0.2s, transform 0.1s;
+}
+.calc-btn:hover { opacity: 0.9; }
+.calc-btn:active { transform: scale(0.98); }
+.calc-btn.cat-mode {
+background: linear-gradient(135deg, var(–cat), var(–cat-dim));
+box-shadow: 0 4px 20px var(–cat-glow);
+}
+
+/* ── Result ── */
+#result {
+width: 100%; max-width: 460px;
+margin-top: 14px;
+border-radius: 20px;
+padding: 20px 18px;
+display: none;
+animation: fadeUp 0.35s ease both;
+}
+#result.show { display: block; }
+.result-eyebrow {
+font-size: 10px; letter-spacing: 0.2em;
+text-transform: uppercase; margin-bottom: 4px;
+}
+.result-meta { font-size: 11px; color: var(–muted); margin-bottom: 14px; }
+.ideal-tag {
+color: #f59e0b; margin-left: 6px; font-size: 10px;
+}
+
+.result-row {
+background: rgba(0,0,0,0.22);
+border-radius: 12px; padding: 13px 15px;
+margin-bottom: 10px;
+display: flex; justify-content: space-between; align-items: center;
+border-left: 3px solid #94a3b8;
+}
+.result-row.der  { border-left-color: var(–accent); }
+.result-row.bcs  { border-left-color: #f59e0b; }
+.result-row.feed { border-left-color: #34d399; }
+
+.row-left .row-label {
+font-size: 11px; font-weight: 600;
+letter-spacing: 0.1em;
+}
+.row-left .row-sub  { font-size: 11px; color: var(–muted); margin-top: 2px; }
+.row-left .row-form { font-size: 10px; color: var(–dim); margin-top: 1px; }
+.row-right {
+font-family: ‘DM Serif Display’, serif;
+font-size: 28px; white-space: nowrap;
+}
+.row-right span { font-family: ‘DM Sans’, sans-serif; font-size: 12px; margin-left: 4px; }
+
+.feed-inner { width: 100%; }
+.feed-line {
+display: flex; justify-content: space-between; align-items: center;
+}
+.feed-line + .feed-line {
+border-top: 1px solid rgba(255,255,255,0.06);
+padding-top: 8px; margin-top: 8px;
+}
+.feed-sub { font-size: 12px; color: var(–muted); }
+
+.result-note {
+margin-top: 12px; padding: 10px 13px;
+background: rgba(0,0,0,0.15); border-radius: 8px;
+font-size: 10px; color: #334155; line-height: 1.9;
+}
+
+/* ── Animations ── */
+@keyframes fadeDown {
+from { opacity:0; transform:translateY(-12px); }
+to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeUp {
+from { opacity:0; transform:translateY(14px); }
+to   { opacity:1; transform:translateY(0); }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Veterinary Clinical Nutrition</div>
+  <h1>エネルギー必要量計算</h1>
+  <div class="subtitle">RER / DER + 給与量換算</div>
+</header>
+
+<div class="card">
+  <!-- Species -->
+  <div class="toggle-wrap">
+    <button class="toggle-btn active-dog" id="btn-dog" onclick="setSpecies('dog')">🐕 犬</button>
+    <button class="toggle-btn" id="btn-cat" onclick="setSpecies('cat')">🐈 猫</button>
+  </div>
+
+  <!-- 体重 -->
+
+  <div class="field">
+    <label class="field-label">体重 (kg)</label>
+    <input type="number" id="weight" placeholder="例: 5.2" step="0.1" min="0">
+  </div>
+
+  <!-- 年齢 -->
+
+  <div class="field">
+    <label class="field-label">年齢（参考）</label>
+    <input type="text" id="age" placeholder="例: 3歳 / 8ヶ月" style="color:#475569;font-size:13px">
+  </div>
+
+  <!-- 避妊・去勢 -->
+
+  <div class="field">
+    <label class="field-label">避妊・去勢</label>
+    <div class="btn-group">
+      <button class="radio-btn active" id="btn-neutered" onclick="setNeutered(true)">済み</button>
+      <button class="radio-btn" id="btn-intact" onclick="setNeutered(false)">なし</button>
+    </div>
+  </div>
+
+  <!-- BCS -->
+
+  <div class="field">
+    <label class="field-label">BCS（Body Condition Score）</label>
+    <div class="bcs-group" id="bcs-group"></div>
+    <div class="bcs-note" id="bcs-note"></div>
+  </div>
+
+  <!-- ライフステージ -->
+
+  <div class="field">
+    <label class="field-label">ライフステージ / 状態</label>
+    <select id="stage"></select>
+  </div>
+
+  <!-- フードカロリー -->
+
+  <div class="field">
+    <label class="field-label">フードのカロリー密度（kcal / 100g）※任意</label>
+    <input type="number" id="kcal" placeholder="例: 370（袋の裏面記載値）" min="0">
+    <div style="font-size:10px;color:#334155;margin-top:4px">入力すると1日給与量(g)を自動算出します</div>
+  </div>
+
+<button class="calc-btn" id="calc-btn" onclick="calculate()">計算する</button>
+
+</div>
+
+<!-- Result -->
+
+<div id="result">
+  <div class="result-eyebrow" id="res-eyebrow">計算結果</div>
+  <div class="result-meta" id="res-meta"></div>
+
+  <!-- RER -->
+
+  <div class="result-row" id="row-rer">
+    <div class="row-left">
+      <div class="row-label" style="color:#94a3b8">RER</div>
+      <div class="row-sub">安静時エネルギー要求量</div>
+      <div class="row-form">70 × BW^0.75</div>
+    </div>
+    <div class="row-right" style="color:#94a3b8" id="val-rer">—<span>kcal/日</span></div>
+  </div>
+
+  <!-- DER -->
+
+  <div class="result-row der" id="row-der">
+    <div class="row-left">
+      <div class="row-label" id="der-label">DER</div>
+      <div class="row-sub" id="der-sub">—</div>
+      <div class="row-form" id="der-form">—</div>
+    </div>
+    <div class="row-right" id="val-der">—<span>kcal/日</span></div>
+  </div>
+
+  <!-- DER BCS補正 -->
+
+  <div class="result-row bcs" id="row-bcs" style="display:none">
+    <div class="row-left">
+      <div class="row-label" style="color:#f59e0b">DER（BCS補正後）</div>
+      <div class="row-sub" id="bcs-corr-sub">—</div>
+      <div class="row-form" id="bcs-corr-form">—</div>
+    </div>
+    <div class="row-right" style="color:#f59e0b" id="val-der-bcs">—<span>kcal/日</span></div>
+  </div>
+
+  <!-- 給与量 -->
+
+  <div class="result-row feed" id="row-feed" style="display:none">
+    <div class="feed-inner">
+      <div style="font-size:10px;color:#34d399;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px">1日給与量</div>
+      <div class="feed-line">
+        <div class="feed-sub">DER ベース</div>
+        <div class="row-right" style="color:#34d399" id="val-feed">—<span>g / 日</span></div>
+      </div>
+      <div class="feed-line" id="feed-bcs-line" style="display:none">
+        <div class="feed-sub">BCS補正後</div>
+        <div class="row-right" style="color:#f59e0b" id="val-feed-bcs">—<span>g / 日</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-note">
+    ※ 理想体重推定：BCS1段階≒10%体重差で補正（BCS3が基準）<br>
+    ※ 給与量はドライフードのみ対象。ウェット混合時は別途換算が必要です。<br>
+    ※ 本計算値は初期設定の目安です。体重モニタリングで適宜調整してください。
+  </div>
+</div>
+
+<script>
+const BCS_DATA = {
+  dog: [
+    { score:1, label:"痩せすぎ", mult:1.6, note:"BCS1：肋骨・脊椎が目視で明瞭" },
+    { score:2, label:"痩せ気味", mult:1.6, note:"BCS2：肋骨が容易に触知" },
+    { score:3, label:"理想体型", mult:1.0, note:"BCS3：理想体重" },
+    { score:4, label:"やや太め", mult:0.9, note:"BCS4：肋骨触知に軽度脂肪" },
+    { score:5, label:"肥満",     mult:0.8, note:"BCS5：肋骨触知困難・腹部膨隆" },
+  ],
+  cat: [
+    { score:1, label:"痩せすぎ", mult:1.6, note:"BCS1：肋骨・脊椎が目視で明瞭" },
+    { score:2, label:"痩せ気味", mult:1.4, note:"BCS2：肋骨が容易に触知" },
+    { score:3, label:"理想体型", mult:1.0, note:"BCS3：理想体重" },
+    { score:4, label:"やや太め", mult:0.8, note:"BCS4：肋骨触知に軽度脂肪" },
+    { score:5, label:"肥満",     mult:0.8, note:"BCS5：肋骨触知困難・腹部膨隆" },
+  ],
+};
+
+const STAGES = {
+  dog: [
+    { id:"neutered_adult", label:"避妊・去勢済み 成犬",   factor:1.6, neutered:true  },
+    { id:"intact_adult",   label:"未避妊・未去勢 成犬",   factor:1.8, neutered:false },
+    { id:"obese_prone",    label:"肥満傾向",               factor:1.4, neutered:null  },
+    { id:"weight_loss",    label:"減量中",                 factor:1.0, neutered:null  },
+    { id:"puppy_lt4m",     label:"成長期（4ヶ月未満）",   factor:3.0, neutered:null  },
+    { id:"puppy_gt4m",     label:"成長期（4ヶ月〜成熟）", factor:2.0, neutered:null  },
+    { id:"pregnant",       label:"妊娠中",                 factor:2.0, neutered:null  },
+    { id:"lactating",      label:"授乳中",                 factor:4.0, neutered:null  },
+    { id:"working",        label:"作業犬・高活動",         factor:2.0, neutered:null  },
+    { id:"senior",         label:"高齢犬（活動低下）",     factor:1.4, neutered:null  },
+  ],
+  cat: [
+    { id:"neutered_adult", label:"避妊・去勢済み 成猫",   factor:1.2, neutered:true  },
+    { id:"intact_adult",   label:"未避妊・未去勢 成猫",   factor:1.4, neutered:false },
+    { id:"inactive",       label:"非活動・肥満傾向",       factor:1.0, neutered:null  },
+    { id:"weight_loss",    label:"減量中",                 factor:0.8, neutered:null  },
+    { id:"kitten_lt4m",    label:"成長期（4ヶ月未満）",   factor:2.5, neutered:null  },
+    { id:"kitten_gt4m",    label:"成長期（4ヶ月〜成熟）", factor:1.8, neutered:null  },
+    { id:"pregnant",       label:"妊娠中",                 factor:1.6, neutered:null  },
+    { id:"lactating",      label:"授乳中",                 factor:2.5, neutered:null  },
+    { id:"senior",         label:"高齢猫（活動低下）",     factor:1.1, neutered:null  },
+  ],
+};
+
+let species  = "dog";
+let bcs      = 3;
+let neutered = true;
+
+function setSpecies(s) {
+  species = s;
+  document.getElementById("btn-dog").className = "toggle-btn" + (s==="dog" ? " active-dog" : "");
+  document.getElementById("btn-cat").className = "toggle-btn" + (s==="cat" ? " active-cat" : "");
+  document.getElementById("calc-btn").className = "calc-btn" + (s==="cat" ? " cat-mode" : "");
+  renderBCS();
+  renderStages();
+  document.getElementById("result").classList.remove("show");
+}
+
+function setNeutered(v) {
+  neutered = v;
+  document.getElementById("btn-neutered").className = "radio-btn" + (v ? " active" : "");
+  document.getElementById("btn-intact").className   = "radio-btn" + (!v ? " active" : "");
+  renderStages();
+}
+
+function renderBCS() {
+  const wrap = document.getElementById("bcs-group");
+  wrap.innerHTML = "";
+  BCS_DATA[species].forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "bcs-btn" + (b.score===bcs ? " active" : "");
+    btn.textContent = b.score;
+    btn.title = b.note;
+    btn.onclick = () => { bcs = b.score; renderBCS(); };
+    wrap.appendChild(btn);
+  });
+  const cur = BCS_DATA[species].find(b=>b.score===bcs);
+  document.getElementById("bcs-note").textContent = cur ? cur.note : "";
+}
+
+function renderStages() {
+  const sel = document.getElementById("stage");
+  const list = STAGES[species];
+  sel.innerHTML = "";
+  list.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = `${s.label}（×${s.factor}）`;
+    sel.appendChild(opt);
+  });
+  // デフォルト選択
+  const def = list.find(s => s.neutered === neutered) || list[0];
+  sel.value = def.id;
+}
+
+function calcRER(bw) { return 70 * Math.pow(bw, 0.75); }
+
+function estimateIdealBW(w, b) {
+  const diff = (b - 3) * 0.1;
+  return w / (1 + diff);
+}
+
+function calculate() {
+  const w = parseFloat(document.getElementById("weight").value);
+  if (!w || w <= 0) {
+    alert("体重を入力してください");
+    return;
+  }
+
+  const bcsData = BCS_DATA[species].find(b => b.score === bcs);
+  const stageId = document.getElementById("stage").value;
+  const stage   = STAGES[species].find(s => s.id === stageId);
+  const kcalPer = parseFloat(document.getElementById("kcal").value);
+
+  const idealBW = estimateIdealBW(w, bcs);
+  const rer     = calcRER(idealBW);
+  const der     = rer * stage.factor;
+  const derBCS  = der * bcsData.mult;
+  const hasBCS  = bcs !== 3;
+
+  const feedBase = (!isNaN(kcalPer) && kcalPer > 0) ? (der / kcalPer) * 100 : null;
+  const feedBCS  = (!isNaN(kcalPer) && kcalPer > 0) ? (derBCS / kcalPer) * 100 : null;
+
+  // accent color
+  const accent = species === "dog" ? "#E07A3A" : "#5B8FC9";
+  const res = document.getElementById("result");
+  res.style.background = species==="dog"
+    ? "linear-gradient(135deg,rgba(224,122,58,0.08),rgba(122,58,16,0.12))"
+    : "linear-gradient(135deg,rgba(91,143,201,0.08),rgba(30,58,96,0.12))";
+  res.style.border = `1px solid ${accent}44`;
+  res.style.boxShadow = `0 12px 40px ${species==="dog"?"rgba(224,122,58,0.18)":"rgba(91,143,201,0.18)"}`;
+
+  document.getElementById("res-eyebrow").style.color = accent;
+  document.getElementById("res-meta").innerHTML =
+    `推定理想体重：<span style="color:#94a3b8">${idealBW.toFixed(2)} kg</span>`
+    + (hasBCS ? `<span class="ideal-tag">（BCS補正済み）</span>` : "");
+
+  document.getElementById("val-rer").innerHTML = `${Math.round(rer)}<span>kcal/日</span>`;
+
+  document.getElementById("der-label").style.color = accent;
+  document.getElementById("der-label").textContent = "DER";
+  document.getElementById("der-sub").textContent = stage.label;
+  document.getElementById("der-form").textContent = `RER × ${stage.factor}`;
+  document.getElementById("val-der").style.color = accent;
+  document.getElementById("val-der").innerHTML = `${Math.round(der)}<span>kcal/日</span>`;
+
+  // BCS補正行
+  if (hasBCS) {
+    document.getElementById("bcs-corr-sub").textContent = `BCS${bcs}：${bcsData.label}　補正係数 ×${bcsData.mult}`;
+    document.getElementById("bcs-corr-form").textContent = `DER × ${bcsData.mult}`;
+    document.getElementById("val-der-bcs").innerHTML = `${Math.round(derBCS)}<span>kcal/日</span>`;
+    document.getElementById("row-bcs").style.display = "flex";
+  } else {
+    document.getElementById("row-bcs").style.display = "none";
+  }
+
+  // 給与量
+  if (feedBase) {
+    document.getElementById("val-feed").innerHTML = `${feedBase.toFixed(1)}<span>g / 日</span>`;
+    if (hasBCS) {
+      document.getElementById("val-feed-bcs").innerHTML = `${feedBCS.toFixed(1)}<span>g / 日</span>`;
+      document.getElementById("feed-bcs-line").style.display = "flex";
+    } else {
+      document.getElementById("feed-bcs-line").style.display = "none";
+    }
+    document.getElementById("row-feed").style.display = "flex";
+  } else {
+    document.getElementById("row-feed").style.display = "none";
+  }
+
+  res.classList.remove("show");
+  void res.offsetWidth; // reflow for animation
+  res.classList.add("show");
+}
+
+// Init
+renderBCS();
+renderStages();
+</script>
+
+</body>
+</html>
