@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q4 獣医看護・テクニシャン基礎 3択クイズ</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--ink:#1f2937;--muted:#6b7280;--accent:#2563eb;--good:#16a34a;--bad:#dc2626;--line:#e5e7eb;}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#eef4ff,#fdfdfd);color:var(--ink);}
+    header{padding:28px 18px;text-align:center;background:#fff;border-bottom:1px solid var(--line)}
+    h1{margin:0 0 8px;font-size:clamp(22px,4vw,34px)}
+    .sub{color:var(--muted);font-size:14px}.wrap{max-width:900px;margin:24px auto;padding:0 14px}.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(15,23,42,.08);padding:20px;margin-bottom:16px}.progress{height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:var(--accent);transition:.25s}.qmeta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:14px;margin:12px 0}.question{font-size:21px;font-weight:700;line-height:1.45;margin:12px 0 18px}.choices{display:grid;gap:10px}.choice{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 16px;text-align:left;font-size:16px;cursor:pointer;transition:.15s}.choice:hover{border-color:var(--accent);transform:translateY(-1px)}.choice.correct{border-color:var(--good);background:#ecfdf5}.choice.wrong{border-color:var(--bad);background:#fef2f2}.explain{display:none;margin-top:16px;padding:14px;border-left:5px solid var(--accent);background:#eff6ff;border-radius:10px;line-height:1.7}.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}button.primary,button.secondary{border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button.primary{background:var(--accent);color:#fff}button.secondary{background:#e5e7eb;color:#111827}.result{text-align:center}.score{font-size:38px;font-weight:800;margin:12px}.small{font-size:13px;color:var(--muted)}.tag{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 10px;font-size:12px;margin-bottom:8px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Q4 獣医看護・テクニシャン基礎 3択クイズ</h1>
+  <div class="sub">McCurnin’s Clinical Textbook for Veterinary Technicians and Nurses の該当範囲を参考にした学習用クイズ</div>
+</header>
+<main class="wrap">
+  <section class="panel" id="quiz">
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="qmeta"><span id="count"></span><span id="scoreNow"></span></div>
+    <div class="tag" id="category"></div>
+    <div class="question" id="question"></div>
+    <div class="choices" id="choices"></div>
+    <div class="explain" id="explain"></div>
+    <div class="btns"><button class="primary" id="nextBtn" style="display:none">次の問題へ</button><button class="secondary" id="restartBtn">最初から</button></div>
+  </section>
+  <section class="panel small">
+    選択肢は各問題ごとに自動シャッフルされます。正答位置がAに偏らないように設計しています。
+  </section>
+</main>
+<script>
+const rawQuestions = [
+{cat:'職域と歴史',q:'北米で veterinary technician という語が正式に承認された契機として最も適切なのはどれか。',choices:['AVMA House of Delegates により veterinary technician の用語が正式承認された','全米の全州で同じ法的業務範囲が同時に制定された','獣医師の外科手術権限がテクニシャンへ移管された'],answer:0,ex:'本文では、以前は animal health technician と呼ばれ、1989年に AVMA の House of Delegates が veterinary technician という語を正式承認したと説明されています。'},
+{cat:'職域と歴史',q:'現代の動物病院における veterinary technician / nurse の位置づけとして最も正しいものはどれか。',choices:['獣医師と飼い主・支援スタッフをつなぐ重要なリンクである','受付業務のみに限定される職種である','獣医師の監督なしに全診断と手術を行う職種である'],answer:0,ex:'本文では、テクニシャンが獣医師とサポート人員・飼い主の間の重要な連結役になるとされています。'},
+{cat:'職域と歴史',q:'mixed animal practice の説明として最も適切なのはどれか。',choices:['産業動物と伴侶動物の両方を扱う診療形態','鳥類と爬虫類のみを扱う診療形態','研究施設だけで行う診療形態'],answer:0,ex:'mixed animal practice は farm animals と companion animals の両方を扱う診療形態として説明されています。'},
+{cat:'雇用と待遇',q:'獣医療現場でテクニシャンの離職が問題になる主因として本文で挙げられているものはどれか。',choices:['評価不足・活用不足・低賃金・昇進機会不足','診療件数が少なすぎることのみ','動物種が多すぎることのみ'],answer:0,ex:'離職理由として、appreciation の不足、underutilization、low pay、advancement opportunity の不足が挙げられています。'},
+{cat:'雇用と待遇',q:'十分に管理された動物病院で、テクニシャンが担うべき業務の考え方として適切なのはどれか。',choices:['法的に獣医師のみが行える業務以外の動物ケア業務を、適切に委任される','すべての業務を獣医師だけが行う','受付以外の業務は委任してはならない'],answer:0,ex:'Technician Note では、獣医師のみが法的に許される業務以外の動物ケア業務は、テクニシャンやアシスタントへ委任されるべきとされています。'},
+{cat:'教育制度',q:'米国の veterinary technology program の学位として本文に示されるものはどれか。',choices:['2〜3年の associate degree または4年の baccalaureate degree','6年制の獣医学士のみ','高校卒業証明のみ'],answer:0,ex:'米国では2〜3年課程で associate degree、4年課程で baccalaureate degree を授与するプログラムが説明されています。'},
+{cat:'教育制度',q:'AVMA が米国の veterinary technology program に求める内容として最も適切なのはどれか。',choices:['標準カリキュラムと必須実技課題の達成確認','臨床実習を完全に任意とすること','薬理学を教えないこと'],answer:0,ex:'本文では、標準カリキュラムと、学生が卒業前に必須タスクを完了したことの文書化が求められるとされています。'},
+{cat:'教育制度',q:'遠隔教育プログラムで学生に特に求められる特性はどれか。',choices:['高い自己規律と独立学習能力','対面授業よりも学習量が不要であること','臨床経験を全く必要としないこと'],answer:0,ex:'Distance Education の項では、遠隔教育は厳格であり、学生に高い自己規律が必要と説明されています。'},
+{cat:'資格試験',q:'VTNE の正式名称として正しいものはどれか。',choices:['Veterinary Technician National Examination','Veterinary Treatment Nursing Ethics','Veterinary Team Navigation Exercise'],answer:0,ex:'VTNE は Veterinary Technician National Examination の略称です。'},
+{cat:'資格試験',q:'VTNE の採点対象問題数として本文に示されるものはどれか。',choices:['170問中150問が採点対象','全200問が採点対象','50問のみが採点対象'],answer:0,ex:'VTNE は170問のうち150問が最終スコアに含まれ、20問は試験的問題と説明されています。'},
+{cat:'資格試験',q:'VTNE の主要領域で最も比率が高いものはどれか。',choices:['Animal Care and Nursing','Dentistry','Diagnostic Imaging'],answer:0,ex:'本文の領域配分では Animal Care and Nursing が20%で最も高く示されています。'},
+{cat:'資格試験',q:'VTNE に関する説明として正しいものはどれか。',choices:['コンピュータベースで、北米の試験センターで実施される','紙試験のみで毎月任意日に受けられる','獣医師免許試験の別名である'],answer:0,ex:'VTNE は computer-based examination と説明され、北米の試験センターで実施されます。'},
+{cat:'継続教育',q:'Continuing Education（CE）の主目的として適切なのはどれか。',choices:['免許・認定・登録の維持と知識更新','初回の採用面接を省略すること','給与を自動的に倍増させること'],answer:0,ex:'多くの州・地域では、licensure, certification, registration の維持のため CE が必要と説明されています。'},
+{cat:'専門資格',q:'VTS の意味として最も適切なのはどれか。',choices:['特定分野で高度な技能と理解を得た veterinary technician specialist','動物病院の受付主任','獣医師免許を持つ外科専門医'],answer:0,ex:'VTS は Veterinary Technician Specialist で、専門領域で高度な技能と理解を有するテクニシャンを指します。'},
+{cat:'専門資格',q:'NAVTA が CVTS を設立した目的として適切なのはどれか。',choices:['テクニシャン専門分野の発展を導き、基準を構造化するため','すべての獣医師を専門医にするため','動物病院の会計基準を統一するため'],answer:0,ex:'本文では、NAVTA が Committee on Veterinary Technician Specialties を設立し、専門性発展の基準を構造化したと説明されています。'},
+{cat:'専門資格',q:'VTS 取得要件として一般に必要とされるものはどれか。',choices:['教育・経験・訓練要件を満たし、専門アカデミーに審査承認される','高校在学中であれば自動的に取得できる','獣医師免許を取得するだけでよい'],answer:0,ex:'本文では、教育・訓練・経験要件の完了と各アカデミーによる審査承認が必要とされています。'},
+{cat:'専門資格',q:'本文に出てくる専門アカデミー領域として適切なのはどれか。',choices:['Emergency and Critical Care, Dentistry, Internal Medicine など','宇宙工学と航空操縦のみ','税務会計と法律相談のみ'],answer:0,ex:'NAVTA 認定領域として救急集中治療、歯科、内科、麻酔・鎮痛など複数の専門領域が挙げられています。'},
+{cat:'専門職性',q:'専門職 profession の特徴として本文に含まれるものはどれか。',choices:['倫理規範、専門知識、社会への特定サービスを持つ','誰でも無教育で即日名乗れる','単純作業だけで独立判断をしない'],answer:0,ex:'profession の6特徴として、専門教育、専門知識、特定サービス、独立判断、倫理規範、法規制が挙げられています。'},
+{cat:'業務範囲',q:'AAVSB と AVMA が提案した「獣医師のみが行える」業務に含まれないものはどれか。',choices:['体温測定','処方','診断'],answer:0,ex:'獣医師のみが行える業務として prescribe, diagnose, prognose, perform surgery が示されています。体温測定は通常テクニシャンの客観データ収集に含まれます。'},
+{cat:'業務範囲',q:'テクニシャンが行ってはならない業務として本文に示されるものはどれか。',choices:['診断・予後判定・処方・手術','採血補助','検査機器の操作'],answer:0,ex:'本文では、テクニシャンは診断、予後判定、処方、手術を行えないと明記されています。'},
+{cat:'Practice Model',q:'Veterinary technician practice model の目的として正しいものはどれか。',choices:['患者ごとに一貫した質の高いケアを提供する構造化プロセス','外科だけを迅速化する手順','受付会計だけを標準化する手順'],answer:0,ex:'practice model は、各患者に一貫して優れたケアを提供する構造化されたアプローチです。'},
+{cat:'Practice Model',q:'Practice model の5ステップの最初に来るものはどれか。',choices:['Gather data','Evaluate patient response','Add data'],answer:0,ex:'5ステップは Gather data から始まります。'},
+{cat:'Practice Model',q:'Practice model の流れとして正しい順序はどれか。',choices:['Gather data → Identify/Prioritize evaluations → Develop/Implement plan → Evaluate response → Add data','Diagnose → Surgery → Prescription → Prognosis → Billing','Add data → Discharge → Surgery → Billing → Diagnosis'],answer:0,ex:'本文では5つのステップがこの順で示されています。'},
+{cat:'Practice Model',q:'Step 1: Gather Data で収集する主観的情報の例として最も適切なのはどれか。',choices:['飼い主から得た病歴や観察内容','体温のみ','血液検査値のみ'],answer:0,ex:'主観的情報には患者の病歴や飼い主の観察が含まれます。'},
+{cat:'Practice Model',q:'Step 1: Gather Data で収集する客観的情報の例として適切なのはどれか。',choices:['心拍数・呼吸数・体温・CBCなど','飼い主の不安だけ','病院の広告費'],answer:0,ex:'客観的データにはバイタル、体重、体温、血圧、検査結果など測定可能な情報が含まれます。'},
+{cat:'Practice Model',q:'Step 2 の patient evaluations の位置づけとして適切なのはどれか。',choices:['人の看護診断に類似し、患者反応を評価するもの','獣医師による確定診断そのもの','処方箋の別名'],answer:0,ex:'patient evaluations は人の nursing diagnosis に類似し、疾患や治療、環境変化に対する動物の反応を反映すると説明されています。'},
+{cat:'Practice Model',q:'patient evaluations の3分類に含まれるものはどれか。',choices:['実際の問題、将来リスク、飼い主関連の問題','税務、労務、広告','外科、会計、清掃'],answer:0,ex:'評価は、実際の身体・心理的問題、将来リスク、飼い主に関連する問題の3カテゴリに分けられます。'},
+{cat:'優先順位',q:'patient evaluations の優先順位で最も高いカテゴリはどれか。',choices:['Oxygenation','Utility','Activity'],answer:0,ex:'表では Oxygenation が最優先に位置づけられ、気道閉塞や換気異常などが含まれます。'},
+{cat:'優先順位',q:'Oxygenation に含まれる評価として適切なのはどれか。',choices:['Altered ventilation / altered gas diffusion','Overweight','Client knowledge deficit'],answer:0,ex:'Oxygenation には altered gas diffusion、altered ventilation、obstructed airway などが含まれます。'},
+{cat:'優先順位',q:'Hydration に含まれる評価として適切なのはどれか。',choices:['Hypovolemia / Hypervolemia','Aggression','Inappropriate elimination'],answer:0,ex:'Hydration には hypervolemia と hypovolemia が示されています。'},
+{cat:'優先順位',q:'Nutrition に含まれる評価として適切なのはどれか。',choices:['Ineffective nursing / overweight / vomiting-diarrhea','Acute pain only','Decreased perfusion only'],answer:0,ex:'Nutrition には altered oral health, abnormal eating behavior, ineffective nursing, overweight, underweight, vomiting/diarrhea などが含まれます。'},
+{cat:'優先順位',q:'Noncritical Safety に含まれる評価として最も適切なのはどれか。',choices:['Owner knowledge deficit','Obstructed airway','Cardiac insufficiency'],answer:0,ex:'Noncritical Safety には altered mentation, noncompliant owner, hyperthermia/hypothermia, owner knowledge deficit などが含まれます。'},
+{cat:'優先順位',q:'Utility は優先順位上どのような扱いか。',choices:['最も低い優先度で最後に対応する評価群','最優先で酸素化より先に対応する評価群','手術しか含まない評価群'],answer:0,ex:'表では Utility が lowest priority として示され、aggression, anxiety, fear, client coping deficit などが含まれます。'},
+{cat:'計画と介入',q:'Step 3: Develop a Plan of Care and Implement Interventions の説明として正しいものはどれか。',choices:['優先化した評価に対して文書化されたケア計画を作り介入する','診断名を勝手に確定する','処方薬を自由に決める'],answer:0,ex:'テクニシャンは優先化した評価に対し計画を作り、技術的介入を実施します。ただし診断や処方は獣医師の領域です。'},
+{cat:'計画と介入',q:'低体温患者へのテクニシャン介入例として本文に沿うものはどれか。',choices:['温罨法やブランケットなどをケア計画に含める','鎮痛薬を独断で投与する','手術を実施する'],answer:0,ex:'例として、低体温では hot water bottles や heating pads, blankets を計画に含めることが示されています。'},
+{cat:'計画と介入',q:'疼痛がある患者に対するテクニシャンの適切な介入はどれか。',choices:['獣医師へ疼痛を報告し、鎮痛薬が指示されるよう計画に含める','独断で麻薬性鎮痛薬を処方する','痛みを評価しない'],answer:0,ex:'本文では、痛みがある場合に「Notify the veterinarian about pain」を計画に含め、鎮痛薬が指示される流れが示されています。'},
+{cat:'評価と追加データ',q:'Step 4 の目的として適切なのはどれか。',choices:['患者状態の改善・悪化を監視し、計画を調整する','初回問診だけで終了する','会計処理を行う'],answer:0,ex:'Step 4 は再評価により患者状態を確認し、必要に応じてケア計画を調整する段階です。'},
+{cat:'評価と追加データ',q:'Step 5: Add Data の説明として適切なのはどれか。',choices:['治療・入院中の変化に応じて検査や身体検査を追加し再評価する','データを削除して記録を簡略化する','退院後だけに行う'],answer:0,ex:'患者状態の変化に応じて、追加検査や身体検査が必要になることが Step 5 として説明されています。'},
+{cat:'検査と薬局',q:'テクニシャンが行う検査業務として本文に示されるものはどれか。',choices:['CBC、尿検査、糞便検査、耳垢・膣スメアなど','獣医師免許試験の採点','税務監査'],answer:0,ex:'Laboratory and Pharmacy では、CBC、血液鑑別、尿沈渣、糞便寄生虫検査、耳垢・膣スメアなどが示されています。'},
+{cat:'検査と薬局',q:'薬局業務でテクニシャンが注意すべきこととして適切なのはどれか。',choices:['在庫、期限切れ薬、規制薬物の管理を適切に行う','処方内容を自由に変更する','薬剤名を記録しない'],answer:0,ex:'本文では、院内薬局の在庫、期限切れ薬、規制薬物の管理が重要とされています。'},
+{cat:'外来・診察室',q:'外来・診察室でのテクニシャンの役割として適切なのはどれか。',choices:['問診、体重測定、必要器具準備、採血や検体採取補助','診断書の単独発行','手術適応の最終決定'],answer:0,ex:'Outpatients and Examination Room では、問診、体重測定、器具準備、採血、皮膚掻爬、糞便・尿・細胞診検体採取などが示されています。'},
+{cat:'外来・診察室',q:'飼い主対応におけるテクニシャンの役割として本文に合うものはどれか。',choices:['予防、食事、行動、投薬、退院指示などの情報提供を補助する','飼い主との会話を避ける','説明はすべて受付に任せる'],answer:0,ex:'本文では、予防ケア、食事、行動、投薬、退院指示などの情報提供が挙げられています。'},
+{cat:'画像診断',q:'X線検査におけるテクニシャンの役割として正しいものはどれか。',choices:['ポジショニング、条件設定、適切な撮影、放射線防護','画像診断の最終読影のみ','放射線防護を不要とする'],answer:0,ex:'Radiology and Special Imaging では、ポジショニング、設定、適切な撮影と、鉛エプロン・手袋・甲状腺シールド・線量計などの防護が示されています。'},
+{cat:'画像診断',q:'デジタルX線画像の利点として本文に示されるものはどれか。',choices:['撮影が速く、調整しやすく、保存しやすく、電子送信できる','必ず麻酔が不要になる','読影が不要になる'],answer:0,ex:'デジタル画像は標準X線より速く、調整が容易で保存しやすく、電子的に送信可能と説明されています。'},
+{cat:'治療室',q:'治療室の説明として適切なのはどれか。',choices:['処置や手術準備のため患者が運ばれる中央的な部屋であることが多い','受付だけを行う部屋','薬剤保管のみを行う部屋'],answer:0,ex:'Treatment Room では、多くの病院で患者が処置や手術準備のために連れてこられる中央的な部屋と説明されています。'},
+{cat:'治療室',q:'治療室で行われる業務として適切なのはどれか。',choices:['投薬、IVカテーテル設置・管理、包帯交換、経管管理など','法人登記の申請','広告デザインのみ'],answer:0,ex:'治療室では、投薬、IV輸液管理、包帯交換、創傷管理、鼻酸素・経鼻/気管/尿道/腹腔チューブ管理などが挙げられています。'},
+{cat:'手術室',q:'手術室でのORナースの役割として正しいものはどれか。',choices:['患者準備、器具・材料準備、術者補助、術後清掃・滅菌準備','麻酔薬を独断で処方する','術式を単独決定する'],answer:0,ex:'Operating Room では、患者の手術準備、器具・材料準備、術者補助、術後の清掃・器具滅菌準備などが示されています。'},
+{cat:'麻酔',q:'麻酔担当テクニシャンの重要性として正しいものはどれか。',choices:['投与量計算、導入、挿管、術中モニタリングに関わり生命責任が大きい','麻酔中の観察は不要','麻酔器の確認は任意でよい'],answer:0,ex:'Anesthetist は、投与量計算、導入、挿管、術中モニタリングを担い、生命に対する高い責任を伴うと説明されています。'},
+{cat:'麻酔',q:'麻酔開始前に確認すべき装置として本文に示されるものはどれか。',choices:['バルブ、チューブ、気化器、酸素量、再呼吸バッグ','待合室の椅子','広告チラシ'],answer:0,ex:'麻酔器のバルブ、チューブ、気化器、酸素量、再呼吸バッグなどを確認・再確認する責任があるとされています。'},
+{cat:'病棟管理',q:'病棟でのテクニシャン・ナースの役割として適切なのはどれか。',choices:['治療が正確かつ適時に行われるよう支援し、回復期の患者をケアする','入院患者を観察しない','疼痛評価を行わない'],answer:0,ex:'Wards では、治療が正確かつタイムリーに行われ、回復期の動物へ思いやりあるケアを提供する重要性が説明されています。'},
+{cat:'病棟管理',q:'病棟患者でテクニシャンが最初に気づくことが多いものはどれか。',choices:['IVラインや輸液ポンプ異常、状態変化','法人税率の変更','薬価改定'],answer:0,ex:'本文では、患者状態の変化、IVラインや輸液ポンプ・モニター機器の問題に最初に気づくことが多いと説明されています。'},
+{cat:'チーム医療',q:'動物医療チームに関する本文の考え方として最も適切なのはどれか。',choices:['各職種が協働し、質の高い医療提供に寄与する','獣医師だけが全業務を単独で行うべき','専門病院ではチーム連携が不要'],answer:0,ex:'Terminology and Veterinary Health Care Team では、生産的で効率的な病院運営は専門職と支援スタッフからなるチームに依存するとされています。'}
+];
+let questions=[], idx=0, score=0, answered=false;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(){questions=shuffle(rawQuestions.map(x=>({...x})));idx=0;score=0;showQ()}
+function showQ(){answered=false;const q=questions[idx];document.getElementById('bar').style.width=((idx)/questions.length*100)+'%';document.getElementById('count').textContent=`${idx+1} / ${questions.length}`;document.getElementById('scoreNow').textContent=`正答 ${score}`;document.getElementById('category').textContent=q.cat;document.getElementById('question').textContent=q.q;const choices=q.choices.map((t,i)=>({t,correct:i===q.answer}));shuffle(choices);const box=document.getElementById('choices');box.innerHTML='';choices.forEach(c=>{const b=document.createElement('button');b.className='choice';b.textContent=c.t;b.onclick=()=>select(b,c.correct);box.appendChild(b)});document.getElementById('explain').style.display='none';document.getElementById('explain').innerHTML='';document.getElementById('nextBtn').style.display='none'}
+function select(btn,correct){if(answered)return;answered=true;if(correct){score++;btn.classList.add('correct')}else{btn.classList.add('wrong');[...document.querySelectorAll('.choice')].forEach(b=>{const q=questions[idx]; if(b.textContent===q.choices[q.answer]) b.classList.add('correct')})}const q=questions[idx];const exp=document.getElementById('explain');exp.innerHTML=`<b>${correct?'正解です。':'不正解です。'}</b><br>${q.ex}`;exp.style.display='block';document.getElementById('scoreNow').textContent=`正答 ${score}`;document.getElementById('nextBtn').style.display='inline-block'}
+document.getElementById('nextBtn').onclick=()=>{idx++; if(idx>=questions.length){finish()}else showQ()};
+document.getElementById('restartBtn').onclick=start;
+function finish(){document.getElementById('bar').style.width='100%';document.getElementById('quiz').innerHTML=`<div class="result"><h2>終了です</h2><div class="score">${score} / ${questions.length}</div><p>${score>=45?'かなり良い理解です。臨床実務レベルで用語と流れを整理できています。':score>=35?'基礎は十分です。Practice Model と業務範囲を再確認しましょう。':'重要語句をもう一度確認しましょう。特にVTNE、Practice Model、業務範囲が得点源です。'}</p><button class="primary" onclick="location.reload()">もう一度挑戦</button></div>`}
+start();
+</script>
+</body>
+</html>
