@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 | 感染症・人獣共通感染症クイズ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --accent: #00d4aa;
+    --accent2: #ff6b6b;
+    --accent3: #ffd93d;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --correct: #1a7a4a;
+    --correct-bg: #0d3320;
+    --wrong: #7a1a1a;
+    --wrong-bg: #3d0d0d;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0d3320 0%, #0d1117 50%, #1a0d3d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(0,212,170,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .chapter-tag {
+    display: inline-block;
+    background: rgba(0,212,170,0.15);
+    border: 1px solid rgba(0,212,170,0.4);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    border-radius: 100px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(20px, 5vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  #progress-count { color: var(--accent); font-weight: 600; }
+  #score-display { color: var(--accent3); font-weight: 600; }
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #00a884);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* ── QUIZ CONTAINER ── */
+  .quiz-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+    transition: border-color 0.2s;
+  }
+  .q-card.answered { border-color: rgba(0,212,170,0.2); }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .q-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    background: rgba(0,212,170,0.12);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .q-text {
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 400;
+    padding-top: 4px;
+  }
+
+  /* ── OPTIONS ── */
+  .options {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .opt-btn:not(:disabled):hover {
+    border-color: rgba(0,212,170,0.5);
+    background: rgba(0,212,170,0.06);
+  }
+  .opt-key {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .opt-btn.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+  }
+  .opt-btn.correct .opt-key {
+    background: var(--correct);
+    color: white;
+    border-color: var(--correct);
+  }
+  .opt-btn.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--accent2);
+  }
+  .opt-btn.wrong .opt-key {
+    background: var(--accent2);
+    color: white;
+    border-color: var(--accent2);
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    display: none;
+    margin: 0 16px 16px;
+    padding: 14px 16px;
+    background: rgba(0,212,170,0.04);
+    border: 1px solid rgba(0,212,170,0.15);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #b8d4cc;
+  }
+  .explanation.show { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .explanation strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .explanation .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .verdict.ok { background: var(--correct-bg); color: #4cff9e; border: 1px solid var(--correct); }
+  .verdict.ng { background: var(--wrong-bg); color: var(--accent2); border: 1px solid var(--wrong); }
+
+  /* ── RESULT ── */
+  #result-section {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 24px;
+    text-align: center;
+    margin-top: 8px;
+  }
+  #result-section.show { display: block; animation: fadeUp 0.4s ease; }
+  .result-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1;
+    margin: 8px 0;
+  }
+  .result-score span { color: var(--accent); }
+  .result-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+  }
+  .result-rank {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 100px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+  .rank-S { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; }
+  .rank-A { background: linear-gradient(90deg, #00d4aa, #00a884); color: #000; }
+  .rank-B { background: linear-gradient(90deg, #4a9eff, #2563eb); color: #fff; }
+  .rank-C { background: linear-gradient(90deg, #ff9f43, #e17055); color: #fff; }
+  .rank-D { background: linear-gradient(90deg, #ff6b6b, #c0392b); color: #fff; }
+  .retry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: rgba(0,212,170,0.12);
+    border: 1px solid rgba(0,212,170,0.4);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .retry-btn:hover {
+    background: rgba(0,212,170,0.2);
+    border-color: var(--accent);
+  }
+
+  /* ── SOUND INDICATOR ── */
+  .sound-bar {
+    text-align: center;
+    padding: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="chapter-tag">Chapter 5 — Groomer Education Quiz</div>
+  <h1>感染症・<span>人獣共通感染症</span><br>クイズ</h1>
+  <p>Infectious &amp; Zoonotic Diseases of the Dog &nbsp;|&nbsp; 30問 3択</p>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-meta">
+    <span>進捗 <span id="progress-count">0 / 30</span></span>
+    <span>正解 <span id="score-display">0</span> 問</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<div class="quiz-wrap" id="quiz-container"></div>
+
+<div class="quiz-wrap" style="padding-top:0">
+  <div id="result-section">
+    <div class="chapter-tag">RESULT</div>
+    <div class="result-score"><span id="final-score">0</span><small style="font-size:24px;color:var(--text-muted)">/30</small></div>
+    <div class="result-label" id="result-label">お疲れ様でした</div>
+    <div class="result-rank" id="result-rank">—</div>
+    <br>
+    <button class="retry-btn" onclick="retryQuiz()">↺ &nbsp;もう一度挑戦</button>
+  </div>
+  <div class="sound-bar">🔊 正解・不正解時に音が鳴ります</div>
+</div>
+
+<script>
+const quizData = [
+  {
+    q: "自然免疫（innate immunity）が担当する防御バリアに含まれないものはどれか？",
+    opts: ["皮膚・粘膜などの物理的バリア", "記憶B細胞による長期抗体産生", "皮脂・涙・唾液などの分泌物"],
+    ans: 1,
+    exp: "記憶B細胞は<strong>適応免疫（adaptive immunity）</strong>の産物です。自然免疫は皮膚・粘膜のバリア、分泌物、常在菌、貪食細胞（好中球・マクロファージ等）が担い、病原体の種類を問わない<strong>非特異的防御</strong>です。"
+  },
+  {
+    q: "適応免疫（adaptive immunity）の別称として正しいものはどれか？",
+    opts: ["非特異的免疫（Non-specific immunity）", "特異的免疫（Specific immunity）", "受動免疫（Passive immunity）"],
+    ans: 1,
+    exp: "適応免疫は個別の病原体を認識して標的を絞るため<strong>特異的免疫</strong>と呼ばれます。一方、自然免疫は幅広い脅威に対応するため非特異的免疫です。"
+  },
+  {
+    q: "抗原提示細胞（APC）の主な役割はどれか？",
+    opts: ["病原体を分解し、その断片を細胞表面に提示して適応免疫を起動する", "皮膚のTEWLを測定してバリア機能を評価する", "IgEを産生してアレルギー反応を引き起こす"],
+    ans: 0,
+    exp: "APCは細菌などの病原体を貪食（phagocytosis）し、酵素で断片化。その断片（抗原）を細胞表面に提示してリンパ節の適応免疫担当細胞に情報を伝えます。<strong>「前線の情報将校」</strong>のような役割です。"
+  },
+  {
+    q: "ウイルスが他の生細胞なしに増殖できない理由として正しいのはどれか？",
+    opts: ["ウイルスは核を持たないため", "ウイルス自身は複製機構を持たず、宿主細胞の機構を乗っ取る必要があるため", "ウイルスは二分裂できないため"],
+    ans: 1,
+    exp: "ウイルスはDNAまたはRNAとタンパク質コートで構成される<strong>単純な構造体</strong>で、自力では増殖できません。宿主細胞の内部機構を「ハイジャック」して複製します。光学顕微鏡では見えず、電子顕微鏡が必要です。"
+  },
+  {
+    q: "犬のジステンパー（Canine Distemper）の原因ウイルスに最も近縁のヒトの疾患はどれか？",
+    opts: ["インフルエンザ", "はしか（麻疹）", "狂犬病"],
+    ans: 1,
+    exp: "ジステンパーウイルスは<strong>モルビリウイルス（Morbillivirus）</strong>の一種で、ヒトの麻疹ウイルスと同じグループです。飛沫感染（aerosol droplets）で伝播し、多くの家庭用消毒剤で不活化できます。"
+  },
+  {
+    q: "犬ジステンパーの臨床徴候として誤っているものはどれか？",
+    opts: ["鼻・眼からの分泌物、発熱", "血尿および黄疸（jaundice）", "鼻鏡・肉球の硬化（hard pad）"],
+    ans: 1,
+    exp: "血尿・黄疸はジステンパーではなく<strong>レプトスピラ症</strong>や<strong>犬伝染性肝炎</strong>の特徴です。ジステンパーは発熱、鼻眼分泌物、咳、嘔吐下痢、運動失調、けいれん、hard padが典型的な所見です。"
+  },
+  {
+    q: "犬パルボウイルス（CPV）が消毒剤に強い抵抗性を持つことの実務的意義として最も適切なものはどれか？",
+    opts: ["感染犬の来院後、乾燥するまで待てばウイルスは死滅する", "使用する消毒剤はCPV不活化が独立試験で確認されたものを選ぶ必要がある", "アルコール系消毒剤を2倍量使用すれば十分効果がある"],
+    ans: 1,
+    exp: "CPVは環境中で<strong>数ヶ月〜数年</strong>生存可能です。最も有効な消毒剤はハロゲン系（塩素・ヨード）やアルデヒド・水酸化ナトリウム系。<strong>「動物タンパクが存在すると効力が落ちる」</strong>ため、消毒前に表面を十分洗浄することが必須です。"
+  },
+  {
+    q: "CPV腸炎型の臨床徴候として典型的でないものはどれか？",
+    opts: ["重篤な嗜眠・発熱（最高41°C）・血様下痢", "角膜浮腫（青色眼 Blue Eye）", "嘔吐・脱水・ショック・虚脱・死亡"],
+    ans: 1,
+    exp: "角膜の浮腫による「青色眼（Blue Eye）」は<strong>犬伝染性肝炎（CAV1感染）</strong>の特徴的な所見です。CPV腸炎型は血様下痢・嘔吐・高熱・脱水・ショック・死亡が特徴で、特にロットワイラーなど黒褐色の犬種で重症化しやすいとされています。"
+  },
+  {
+    q: "犬伝染性肝炎の原因病原体はどれか？",
+    opts: ["Canine Parvovirus（CPV）", "Canine Adenovirus type 1（CAV1）", "Lyssavirus"],
+    ans: 1,
+    exp: "犬伝染性肝炎は<strong>CAV1（犬アデノウイルス1型）</strong>が原因です。環境中で数ヶ月生存し、感染後数ヶ月間ウイルス排泄が続くため、グルーミングサロンの器具・寝具汚染に注意が必要です。"
+  },
+  {
+    q: "レプトスピラ症（Leptospirosis）において、最も重要な感染源動物（reservoir）はどれか？",
+    opts: ["感染したネコ", "感染したネズミなどのげっ歯類", "感染したハトなどの鳥類"],
+    ans: 1,
+    exp: "<strong>L. icterohaemorrhagiae（Weil病）</strong>はラット（ネズミ）が主要保因者。感染尿・汚染水を介して犬・人に伝播します。グルーミングサロンでの洗浄時に尿エアロゾルが発生するリスクがあるため、使い捨て手袋と水槽の密閉管理が重要です。"
+  },
+  {
+    q: "レプトスピラ症の伝播経路として誤っているものはどれか？",
+    opts: ["感染尿との接触", "汚染水を飲む・泳ぐ", "飛沫（くしゃみ）による気道感染"],
+    ans: 2,
+    exp: "レプトスピラの主要感染経路は尿・尿エアロゾル・汚染水・感染動物との接触・咬傷です。<strong>くしゃみによる気道感染</strong>はボルデテラ（ケンネルコフ）など呼吸器病原体の特徴で、レプトスピラには当てはまりません。"
+  },
+  {
+    q: "ボルデテラ・ブロンキセプティカ（Bordetella bronchiseptica）に関する記述で正しいのはどれか？",
+    opts: ["犬ケンネルコフの最も一般的な細菌性原因菌で、グルーミングテーブルなど器物表面にも存在しうる", "感染後の排菌期間は最長1週間である", "犬のみに感染し、猫・うさぎには感染しない"],
+    ans: 0,
+    exp: "Bordetellaは呼吸器分泌物に含まれ、<strong>グルーミングテーブル・床・秤など</strong>の器物を汚染します。排菌は症状が治まった後も<strong>最長4ヶ月</strong>続く可能性があります。猫・ウサギ・ブタなど多くの哺乳類にも感染します。"
+  },
+  {
+    q: "狂犬病ウイルスが咬傷後に脳に到達するメカニズムとして正しいのはどれか？",
+    opts: ["血流に乗って脳へ到達する", "末梢神経を逆行性に上行して中枢神経系へ侵入する", "リンパ管を経由して頸部リンパ節から脳へ達する"],
+    ans: 1,
+    exp: "狂犬病ウイルスは咬傷部位の<strong>末梢神経に侵入し、脊髄・脳へ逆行性に上行</strong>します。潜伏期は9日〜1年以上と幅広く、この間ウイルスは神経内を移動しています。脳到達後は唾液腺に拡散し、唾液中にウイルスが分泌されます。"
+  },
+  {
+    q: "狂犬病の第3期（dumb phase）の特徴的な臨床徴候はどれか？",
+    opts: ["瞳孔散大・軽度の行動変化", "興奮・攻撃性・流涎増加・光恐怖", "麻痺・過剰流涎・呼吸困難・呼吸不全・死亡"],
+    ans: 2,
+    exp: "第1期（前駆期）は行動変化・瞳孔散大。第2期（興奮期）は攻撃性・失調・流涎・光恐怖。<strong>第3期（麻痺期/dumb phase）</strong>は麻痺・呼吸困難・呼吸不全・死亡が特徴です。"
+  },
+  {
+    q: "バベシア症（Babesiosis）の伝播媒介者（ベクター）として正しいのはどれか？",
+    opts: ["蚊（Mosquito）", "マダニ（Biting tick）", "ノミ（Flea）"],
+    ans: 1,
+    exp: "バベシア症は<strong>吸血マダニ</strong>によって伝播される原虫（protozoa）性疾患です。赤血球内で増殖し、重篤な溶血性貧血を引き起こします。感染マダニが吸血してから2〜30日後に症状が現れます。"
+  },
+  {
+    q: "バベシア症の主な臨床徴候として最も適切なセットはどれか？",
+    opts: ["咳・鼻汁・発熱（ケンネルコフ様）", "貧血・黄疸・血尿・発熱・心拍数増加", "水晶体浮腫・角膜の青変・嗜眠"],
+    ans: 1,
+    exp: "<strong>バベシア症</strong>は赤血球が破壊されるため、重篤な貧血・黄疸・血尿（ヘモグロビン尿）・発熱・心拍・呼吸数増加が特徴です。免疫のない犬では急速に悪化するため、緊急獣医受診が必要です。"
+  },
+  {
+    q: "原虫（protozoa）の一般的な感染経路として最も重要なものはどれか？",
+    opts: ["環境中または感染肉に含まれるシストの経口摂取", "感染動物の唾液を介した咬傷", "汚染された空気の吸入"],
+    ans: 0,
+    exp: "原虫は<strong>トロホゾイト（増殖型）とシスト（囊子）</strong>を形成します。シストは環境・組織内で生存可能で、経口摂取することで感染が成立します。トキソプラズマ・ジアルジア・アメーバなどが代表例です。"
+  },
+  {
+    q: "ジアルジア症（Giardiasis）の予防として最も重要な対策はどれか？",
+    opts: ["来院犬のワクチン接種記録の確認", "良好なケンネル衛生と手洗い（糞便汚染の防止）", "年1回のマダニ駆除薬投与"],
+    ans: 1,
+    exp: "ジアルジアは<strong>糞便汚染された食物・水の摂取</strong>が主要感染経路。ワクチンは存在しないため、良好なケンネル衛生管理と<strong>手洗い・食品衛生</strong>が最重要防御手段です。"
+  },
+  {
+    q: "トキソカラ症（Toxocariasis）が特に問題となる理由として正しいのはどれか？",
+    opts: ["成虫が肺に寄生し重篤な咳・呼吸困難を起こすため", "幼虫移行症を引き起こし、まれに人の眼（眼幼虫移行症）を侵して失明の原因となりうるため", "人に感染すると不可逆的な肝硬変を引き起こすため"],
+    ans: 1,
+    exp: "<strong>Toxocara canis</strong>の幼虫は人の体内で移行症を起こします。特に<strong>眼幼虫移行症（ocular larva migrans）</strong>は失明の原因となりえます。子犬の定期的な駆虫と良好な手洗いが予防の鍵です。"
+  },
+  {
+    q: "人獣共通感染症（Zoonosis）の定義として正しいのはどれか？",
+    opts: ["犬から猫に伝播する感染症", "動物から人へ伝播しうる感染症", "複数の動物種に感染するが人には感染しない感染症"],
+    ans: 1,
+    exp: "<strong>Zoonosis（ズーノーシス）</strong>は動物から人に伝播しうる感染症の総称です。本テキストで重点的に扱われるのはレプトスピラ症・狂犬病・疥癬・トキソカラ・トキソプラズマ・ボルデテラなどです。"
+  },
+  {
+    q: "グルーミングサロンでレプトスピラ症のリスクを低減するための実務的対策として最も適切でないのはどれか？",
+    opts: ["ケンネル清掃時に使い捨て手袋を着用し、尿エアロゾルを発生させないよう注意する", "来院犬全頭に過去1年以内のレプトスピラワクチン接種を確認する", "感染犬を発見した場合、隔離ではなく通常のグルーミングを行い早期排菌完了を促す"],
+    ans: 2,
+    exp: "感染が疑われる犬は<strong>直ちに来院拒否・獣医師へ紹介</strong>し、隔離・バリアナーシングが必要です。通常のグルーミングを継続することは感染拡大を招きます。水槽のネズミ侵入防止と定期密閉確認も重要な実務対策です。"
+  },
+  {
+    q: "ワクチン接種による免疫の種類として正しいのはどれか？",
+    opts: ["受動免疫（Passive immunity）", "獲得能動免疫（Acquired active immunity）", "先天性免疫（Congenital immunity）"],
+    ans: 1,
+    exp: "ワクチン接種は免疫系を刺激して適応免疫を誘導するため<strong>獲得能動免疫（acquired active immunity）</strong>と呼ばれます。一方、初乳（colostrum）から子犬が受け取る抗体は受動免疫です。"
+  },
+  {
+    q: "子犬のワクチン接種が通常生後2ヶ月頃から開始される根拠はどれか？",
+    opts: ["生後2ヶ月以前にはワクチン成分に対するアレルギーリスクが高いため", "母犬由来の移行抗体が3〜12週齢にかけて消失し、ワクチンの効果が出やすくなるため", "法律により生後8週齢未満への接種が禁止されているため"],
+    ans: 1,
+    exp: "母犬の初乳由来の<strong>母体移行抗体</strong>はワクチン抗原と反応して免疫誘導を妨げます。この抗体は3〜12週齢で消失するため、通常2回接種（2〜4週間隔）が推奨されます。8週齢時点でまだ移行抗体が残っている可能性があるため、2回目の接種が必要です。"
+  },
+  {
+    q: "ジステンパー・肝炎・パルボウイルスに対するワクチン保護期間の特徴として正しいのはどれか？",
+    opts: ["保護期間は短く、年2回の接種が必要である", "保護期間は比較的長く、2回目の年次接種以降は3年ごとの接種が認可されているものがある", "レプトスピラと同様に毎年接種が必須である"],
+    ans: 1,
+    exp: "ジステンパー・肝炎・パルボウイルスは比較的<strong>長期の免疫</strong>が得られます。現在、一部のワクチンは2回目年次接種以降<strong>3年ごとの接種</strong>が認可されています。一方、レプトスピラワクチンは短命な免疫しか誘導できないため<strong>毎年接種</strong>が強く推奨されます。"
+  },
+  {
+    q: "疥癬（Sarcoptic mange）の伝播経路として正しいのはどれか？",
+    opts: ["蚊による媒介（ベクター感染）", "感染動物との直接接触または汚染器物・環境を介した間接接触", "感染動物の糞便経口摂取"],
+    ans: 1,
+    exp: "疥癬の原因であるヒゼンダニ（Sarcoptes scabiei）は<strong>直接接触</strong>のほか、汚染されたグルーミング器具・タオル・ベッドなどを介した<strong>間接接触</strong>でも感染します。人への感染（人獣共通）も起こり、強い痒みを伴う皮膚炎を引き起こします。"
+  },
+  {
+    q: "白癬（Ringworm）の予防・管理として最も適切なのはどれか？",
+    opts: ["年1回の駆虫薬投与で予防できる", "グルーミング器具・作業面の定期消毒と感染個体の特定・隔離", "感染動物には抗ウイルス薬を投与する"],
+    ans: 1,
+    exp: "白癬（皮膚糸状菌症）は真菌によって起こり、皮膚・毛・爪に局所感染します。<strong>ワクチンなし</strong>、自然免疫が発達すれば自然治癒することもあります。管理は器具の消毒・感染動体の隔離・破損皮膚の保護です。抗ウイルス薬は無効です。"
+  },
+  {
+    q: "トキソプラズマ症（Toxoplasmosis）について最も重要な注意点はどれか？",
+    opts: ["犬から人への直接感染リスクが非常に高い", "妊婦への感染は胎児に深刻な影響を与える可能性があるため、特に注意が必要", "犬への感染は常に致死的な経過をたどる"],
+    ans: 1,
+    exp: "<strong>トキソプラズマ</strong>は犬・人共通の感染症です。特に<strong>妊娠中の感染は胎児に深刻な影響</strong>（流産・先天性障害）をもたらす可能性があります。妊娠前の感染は保護的に働くこともあります。感染経路は未加熱肉・猫糞便・汚染土壌などです。"
+  },
+  {
+    q: "感染（infection）と感染症（infectious disease）の関係として正しいのはどれか？",
+    opts: ["感染は常に感染症（臨床徴候）を引き起こす", "病原体が宿主に侵入・定着しても必ずしも臨床徴候を示さないことがあり、宿主の防御を圧倒した場合に感染症となる", "感染症は非感染性疾患より常に重篤である"],
+    ans: 1,
+    exp: "感染（infection）とは病原体が宿主に侵入し<strong>宿主の防御機構を圧倒した状態</strong>です。感染が局所にとどまる場合（膿瘍）と全身に波及する場合があります。感染があっても臨床徴候が現れない不顕性感染も多く存在します。"
+  },
+  {
+    q: "間接伝播（indirect transmission）の例として正しいのはどれか？",
+    opts: ["感染犬との直接接触による皮膚疥癬の伝播", "汚染されたグルーミングテーブルを介したケンネルコフの伝播", "感染動物に咬まれることによる狂犬病の伝播"],
+    ans: 1,
+    exp: "<strong>間接伝播</strong>は第三の媒介物（器物・表面・汚染食物・水など）を介した伝播です。グルーミングテーブル・タオル・水桶などが媒介物となります。直接伝播は動物から動物・人へ直接接触・咬傷・唾液などによる伝播です。"
+  },
+  {
+    q: "腸内常在菌（microflora）が病原体に対して果たす役割として正しいのはどれか？",
+    opts: ["病原体に対する特異的抗体を産生する", "競合排除（competitive exclusion）により病原体の定着を抑制する", "病原体を直接貪食して排除する"],
+    ans: 1,
+    exp: "消化管や皮膚の常在菌（善玉菌）は<strong>競合排除（competitive exclusion）</strong>によって病原菌の定着を抑制します。抗生物質投与後に常在菌が減少すると、カンジダ（Candida）などの真菌感染が起こりやすくなるのはこのためです。"
+  },
+  {
+    q: "グルーミングサロンにおける感染症対策として、ワクチン接種以外に重要なものはどれか？",
+    opts: ["感染が疑われる犬でも拒否せず積極的に受け入れ早期治癒を促す", "ワクチン接種記録は不要で、接種状況は口頭確認だけで十分である", "適切な消毒プロトコルの実施と感染疑い犬の来院拒否・獣医師への紹介"],
+    ans: 2,
+    exp: "<strong>ワクチン接種は予防の一手段に過ぎず</strong>、良好な衛生管理が不可欠です。感染疑い犬は受け入れを断り、担当獣医師へ紹介することが適切な対応です。パルボウイルスなど環境に長期残存する病原体はワクチン未接種の未知の犬が持ち込む可能性があるため、常に注意が必要です。"
+  }
+];
+
+let answered = 0;
+let score = 0;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  answered = 0;
+  score = 0;
+  updateProgress();
+
+  quizData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = `card-${i}`;
+    card.style.animationDelay = `${i * 0.03}s`;
+
+    const labels = ['A', 'B', 'C'];
+    const optsHtml = item.opts.map((opt, j) => `
+      <button class="opt-btn" onclick="select(${i},${j})" id="opt-${i}-${j}">
+        <span class="opt-key">${labels[j]}</span>
+        <span>${opt}</span>
+      </button>`).join('');
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">Q${i+1}</div>
+        <div class="q-text">${item.q}</div>
+      </div>
+      <div class="options">${optsHtml}</div>
+      <div class="explanation" id="exp-${i}"></div>`;
+    container.appendChild(card);
+  });
+}
+
+function select(qIdx, optIdx) {
+  const item = quizData[qIdx];
+  const isCorrect = optIdx === item.ans;
+
+  // disable all buttons
+  for (let j = 0; j < 3; j++) {
+    const btn = document.getElementById(`opt-${qIdx}-${j}`);
+    btn.disabled = true;
+    if (j === item.ans) btn.classList.add('correct');
+    else if (j === optIdx && !isCorrect) btn.classList.add('wrong');
+  }
+
+  const expEl = document.getElementById(`exp-${qIdx}`);
+  const verdict = isCorrect
+    ? `<span class="verdict ok">✓ 正解</span>`
+    : `<span class="verdict ng">✗ 不正解</span>`;
+  expEl.innerHTML = `${verdict}<br>${item.exp}`;
+  expEl.classList.add('show');
+
+  document.getElementById(`card-${qIdx}`).classList.add('answered');
+
+  if (isCorrect) score++;
+  answered++;
+  updateProgress();
+  playSound(isCorrect);
+
+  if (answered === quizData.length) showResult();
+}
+
+function updateProgress() {
+  document.getElementById('progress-count').textContent = `${answered} / 30`;
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('progress-fill').style.width = `${(answered/30)*100}%`;
+}
+
+function showResult() {
+  const sec = document.getElementById('result-section');
+  sec.classList.add('show');
+  document.getElementById('final-score').textContent = score;
+
+  let rank, label;
+  if (score >= 28) { rank = 'S'; label = '🏆 パーフェクト級！感染症の専門家です'; }
+  else if (score >= 24) { rank = 'A'; label = '優秀！グルーミングの現場で即戦力レベル'; }
+  else if (score >= 18) { rank = 'B'; label = '良好。苦手な分野を重点復習しましょう'; }
+  else if (score >= 12) { rank = 'C'; label = 'もう一度テキストを読み直すことをお勧めします'; }
+  else { rank = 'D'; label = '基礎から丁寧に学び直しましょう'; }
+
+  document.getElementById('result-rank').textContent = `RANK ${rank}`;
+  document.getElementById('result-rank').className = `result-rank rank-${rank}`;
+  document.getElementById('result-label').textContent = label;
+  sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retryQuiz() {
+  document.getElementById('result-section').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(buildQuiz, 400);
+}
+
+// Web Audio API sound
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx;
+function playSound(correct) {
+  try {
+    if (!actx) actx = new AudioCtx();
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.connect(gain); gain.connect(actx.destination);
+    if (correct) {
+      osc.frequency.setValueAtTime(523, actx.currentTime);
+      osc.frequency.setValueAtTime(659, actx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, actx.currentTime + 0.2);
+    } else {
+      osc.frequency.setValueAtTime(300, actx.currentTime);
+      osc.frequency.setValueAtTime(220, actx.currentTime + 0.15);
+    }
+    gain.gain.setValueAtTime(0.18, actx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.4);
+    osc.start(); osc.stop(actx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
