@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>犬の感染症・人獣共通感染症 3択クイズ50問</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--accent:#2563eb;--ok:#16a34a;--ng:#dc2626;--border:#e5e7eb;--soft:#eff6ff;--shadow:0 12px 30px rgba(15,23,42,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#f6f8fb,#eef2ff);color:var(--text)}
+header,main{max-width:980px;margin:0 auto;padding:28px 18px}h1{font-size:clamp(24px,4vw,40px);margin:0 0 10px;font-weight:800}.lead{color:var(--muted);line-height:1.7}.panel{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:22px}.topbar{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}.badge{background:var(--soft);color:var(--accent);padding:8px 12px;border-radius:999px;font-weight:700}.progress-wrap{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:14px 0 20px}.progress{height:100%;background:var(--accent);transition:.25s}.question{font-size:22px;font-weight:800;line-height:1.55;margin:6px 0 18px}.choices{display:grid;gap:12px}.choice{width:100%;text-align:left;border:1px solid var(--border);background:#fff;color:var(--text);padding:16px 18px;border-radius:16px;font-size:17px;cursor:pointer}.choice:hover{border-color:#93c5fd}.choice.correct{border-color:var(--ok);background:#ecfdf5}.choice.wrong{border-color:var(--ng);background:#fef2f2}.choice:disabled{cursor:default}.explain{margin-top:18px;padding:16px;border-left:5px solid var(--accent);background:#f8fafc;border-radius:14px;line-height:1.7;display:none}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:0;background:var(--accent);color:#fff;padding:12px 18px;border-radius:14px;font-weight:800;cursor:pointer}.secondary{background:#64748b}.ghost{background:#fff;color:var(--accent);border:1px solid #bfdbfe}.result{text-align:center;padding:28px 10px}.score{font-size:48px;font-weight:900}.review{margin-top:20px;display:grid;gap:12px}.review-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px}.small{font-size:13px;color:var(--muted)}footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
+</style>
+</head>
+<body>
+<header><h1>犬の感染症・人獣共通感染症 3択クイズ50問</h1><p class="lead">グルーマー・動物看護スタッフ向け。免疫、感染経路、犬の主要感染症、ワクチン、衛生管理を確認する学習Webアプリです。</p></header>
+<main><section class="panel" id="app"></section></main>
+<footer>Based on uploaded teaching material: Infectious and Zoonotic Diseases of the Dog</footer>
+<script>
+const questions=[
+{q:"哺乳類の免疫系を本文ではどのような比喩で説明しているか。",choices:["身体を守る軍隊のような防御システム","消化を助ける酵素の集合体","骨格を支える機械的構造"],answer:0,ex:"本文では免疫系を、外敵から身体を守る“武装部隊”のような防御ネットワークとして説明している。"},
+{q:"自然免疫と適応免疫の関係として最も適切なのはどれか。",choices:["自然免疫は初期防御、適応免疫は特異的防御を担う","自然免疫は抗体だけ、適応免疫は皮膚だけを担う","両者は同じ細胞だけで構成され区別できない"],answer:0,ex:"自然免疫は皮膚・粘膜・炎症・貪食細胞などの初期防御、適応免疫は抗体産生や細胞性免疫など病原体特異的な反応を担う。"},
+{q:"自然免疫が主に監視している身体表面に含まれないものはどれか。",choices:["皮膚","胃腸管","大脳皮質"],answer:2,ex:"皮膚、胃腸管、泌尿生殖器、上気道など、外界との境界面が自然免疫の重要な監視対象である。"},
+{q:"皮膚の角化重層扁平上皮の主な役割はどれか。",choices:["物理的バリアとして病原体侵入を防ぐ","抗体だけを産生する","赤血球を破壊する"],answer:0,ex:"皮膚は乾燥し角化した重層性のバリアで、外部物質や病原体の侵入を防ぐ第一線である。"},
+{q:"粘液分泌と線毛運動の組み合わせが防御に有効な理由はどれか。",choices:["異物や細菌を捕捉し、外へ運び出すため","病原体を血液中に拡散するため","体温を下げるため"],answer:0,ex:"気道では粘液が微粒子や微生物を捕捉し、線毛運動がそれらを排除方向へ移動させる。"},
+{q:"涙や唾液などに含まれ、細菌などに作用するものとして本文に示されているのはどれか。",choices:["酵素や抗微生物ペプチド","ヘモグロビン","胆汁酸だけ"],answer:0,ex:"涙や唾液、皮脂腺分泌物には、細菌・ウイルスなどに対抗する酵素やタンパク質、抗微生物ペプチドが含まれる。"},
+{q:"正常細菌叢の役割として最も適切なのはどれか。",choices:["病原体が定着する空間や栄養を奪い、侵入を抑える","常に感染症を悪化させる","ワクチン効果を完全に無効化する"],answer:0,ex:"正常細菌叢は競合により病原体の過剰増殖を抑える。抗生物質使用やストレスで崩れると真菌感染などのリスクが上がる。"},
+{q:"炎症反応の説明として正しいものはどれか。",choices:["損傷部位へ白血球などを呼び寄せ、赤み・腫れ・痛みを起こし得る","常に無症状で進行する","抗体産生とは一切関係しない単なる熱産生である"],answer:0,ex:"炎症では血管反応と細胞浸潤が起き、赤み・熱感・腫脹・疼痛がみられる。"},
+{q:"抗原提示細胞（APC）の役割として最も適切なのはどれか。",choices:["病原体断片を提示し、リンパ球へ情報を伝える","酸素を運搬する","体毛を産生する"],answer:0,ex:"APCは病原体を取り込み、抗原断片を提示してリンパ球に情報を渡し、適応免疫を始動させる。"},
+{q:"適応免疫の特徴として正しいものはどれか。",choices:["特異性と記憶を持つ","全ての病原体に同じ反応しかできない","皮膚表面だけで完結する"],answer:0,ex:"適応免疫は抗原特異性を持ち、感染後やワクチン後に免疫記憶を形成し得る。"},
+{q:"感染症の定義として最も適切なのはどれか。",choices:["病原体が宿主に侵入・増殖し、構造または機能異常を起こす状態","必ず咬傷だけで起こる疾患","遺伝だけで起こる疾患"],answer:0,ex:"感染症は感染性因子が宿主へ侵入・増殖し、臨床徴候や病理変化を起こすものとして扱われている。"},
+{q:"感染性因子に含まれるものとして適切なのはどれか。",choices:["ウイルス、細菌、真菌、原虫など","ビタミンだけ","ホルモンだけ"],answer:0,ex:"ウイルス、細菌、真菌、原虫などが感染性因子として扱われる。"},
+{q:"人獣共通感染症（zoonosis）の説明として正しいものはどれか。",choices:["動物と人の間で伝播し得る感染症","犬だけに存在し人には関係しない疾患","非感染性の代謝性疾患"],answer:0,ex:"人獣共通感染症は、動物から人、または人から動物へ伝播し得る感染症を指す。"},
+{q:"直接伝播に該当するものはどれか。",choices:["感染動物との接触や咬傷","汚染された食器だけを介する伝播","風で飛んだ花粉によるアレルギー"],answer:0,ex:"直接伝播は動物同士、または人と動物の直接接触によるもの。"},
+{q:"間接伝播に該当するものはどれか。",choices:["汚染されたブラシ、タオル、食器、水などを介する伝播","母犬の遺伝子だけによる伝播","ワクチン接種そのもの"],answer:0,ex:"間接伝播は、汚染された物品や環境を介して起こる。"},
+{q:"尿を介して伝播する例として挙げられている疾患はどれか。",choices:["レプトスピラ症","狂犬病","犬糸状虫症"],answer:0,ex:"尿を介する感染例としてレプトスピラ症が示されている。"},
+{q:"唾液を介して伝播する代表例はどれか。",choices:["狂犬病","ジアルジア症","皮膚糸状菌症"],answer:0,ex:"唾液による伝播例として狂犬病が示されている。咬傷管理が重要である。"},
+{q:"皮膚片・皮膚接触を介する例として示される疾患はどれか。",choices:["疥癬","レプトスピラ症","犬パラインフルエンザ"],answer:0,ex:"皮膚片・皮膚接触の例としてsarcoptic mange（疥癬）が挙げられている。"},
+{q:"糞便を介する感染症の例として適切なのはどれか。",choices:["大腸菌、ジアルジア、トキソプラズマなど","狂犬病だけ","バベシア症だけ"],answer:0,ex:"糞便を介する例としてE. coli、Giardia、Toxoplasmosisが示されている。"},
+{q:"肉を介する感染症の例として挙げられているものはどれか。",choices:["条虫症やトキソプラズマ症","犬ジステンパー","ケンネルコフ"],answer:0,ex:"食肉を介する例として条虫症やトキソプラズマ症が挙げられている。"},
+{q:"真菌の説明として正しいものはどれか。",choices:["植物・動物とは異なる界に属し、キチンを含む細胞壁を持つ","細胞構造を全く持たない","必ず赤血球内だけで増殖する"],answer:0,ex:"真菌は植物・動物とは異なる生物群で、細胞壁にキチンを含む。"},
+{q:"ウイルスの特徴として正しいものはどれか。",choices:["宿主細胞内でのみ複製できる微小な感染性因子","単独で培地上に大型コロニーを作る細菌である","常に肉眼で確認できる"],answer:0,ex:"ウイルスはDNAまたはRNAとタンパク質殻などからなり、宿主細胞の機構を利用して複製する。"},
+{q:"細菌の説明として正しいものはどれか。",choices:["核を持たない単細胞生物で、球菌や桿菌などがある","必ず真核生物である","全てが病原性で有益なものはない"],answer:0,ex:"細菌は原核性単細胞生物で、球菌・桿菌など形態差がある。"},
+{q:"原虫の説明として正しいものはどれか。",choices:["核を持つ単細胞生物で、トキソプラズマやジアルジアなどが含まれる","ウイルスの別名である","全てが植物である"],answer:0,ex:"原虫は真核性単細胞生物で、トキソプラズマ症、ジアルジア症などを起こす。"},
+{q:"犬パルボウイルス（CPV）の特徴として正しいものはどれか。",choices:["環境中で長期間生存し、激しい腸炎を起こし得る","主に赤血球内寄生虫である","蚊だけで伝播する"],answer:0,ex:"CPVは非常に感染力が強く、環境抵抗性が高い。重篤な腸炎を起こす。"},
+{q:"CPVの腸型で典型的にみられる臨床徴候はどれか。",choices:["重度沈鬱、嘔吐、発熱、血様下痢、脱水、ショック","多飲多尿だけ","慢性の外耳炎だけ"],answer:0,ex:"重度嗜眠、嘔吐、発熱、血様下痢、脱水、ショック、虚脱・死亡などが示されている。"},
+{q:"犬ジステンパーの原因病原体として正しいものはどれか。",choices:["モルビリウイルス属のウイルス","大腸菌","バベシア原虫"],answer:0,ex:"犬ジステンパーはMorbillivirus関連のウイルス疾患として扱われている。"},
+{q:"犬ジステンパーの臨床徴候として示されるものはどれか。",choices:["発熱、食欲低下、鼻眼分泌、咳、呼吸困難、下痢嘔吐、協調運動失調など","血尿のみ","皮膚の白癬のみ"],answer:0,ex:"犬ジステンパーでは呼吸器・消化器・神経症状が多彩に出る。"},
+{q:"犬ジステンパーでみられるhard padとは何を指すか。",choices:["鼻鏡や肉球の角化・硬化","歯石の沈着","腸管粘膜の潰瘍"],answer:0,ex:"鼻とフットパッドの硬化が示されている。"},
+{q:"レプトスピラ症の主な保菌・排出源として示される動物はどれか。",choices:["ラットなどのげっ歯類","蝶","金魚"],answer:0,ex:"ラットなどのげっ歯類が主な保菌動物とされ、尿で環境を汚染する。"},
+{q:"レプトスピラ症の感染経路として適切なのはどれか。",choices:["感染尿や尿で汚染された水との接触","乾燥した清潔な金属だけとの接触","空気中の花粉吸入"],answer:0,ex:"感染尿、尿エアロゾル、尿で汚染された水、感染動物、咬傷などが伝播経路である。"},
+{q:"レプトスピラ症で重症化した場合に障害を受けやすい臓器はどれか。",choices:["肝臓と腎臓","眼瞼だけ","爪だけ"],answer:0,ex:"重症例では黄疸、肝障害、腎障害、ショックなどが重要である。"},
+{q:"レプトスピラ症の臨床徴候として示されるものはどれか。",choices:["発熱、筋肉痛、黄疸、嘔吐下痢、脱水、虚脱、ショック","くしゃみだけ","痒みだけ"],answer:0,ex:"発熱、震え・筋肉痛、黄疸、嘔吐下痢、脱水、虚脱、ショックが挙げられている。"},
+{q:"犬パラインフルエンザの説明として適切なのはどれか。",choices:["ケンネルコフ症候群に関与し、呼吸器分泌物で伝播しやすい","赤血球内で増殖する原虫症である","尿でのみ伝播する細菌症である"],answer:0,ex:"犬パラインフルエンザはケンネルコフ症候群に関与する伝染性の高いウイルス疾患である。"},
+{q:"パラインフルエンザ感染の臨床徴候として示されるものはどれか。",choices:["咽頭痛、嗄声、食欲不振、体重減少、元気消失など","血尿と黄疸だけ","痙攣だけ"],answer:0,ex:"sore throat、hoarseness、inappetence、weight loss、lethargyが示される。"},
+{q:"犬伝染性肝炎（CAV-1）の主な標的臓器として正しいものはどれか。",choices:["肝臓、腎臓、眼、肺など","皮膚角質だけ","赤血球だけ"],answer:0,ex:"CAV-1は肝臓、腎臓、眼、肺などに影響し得る。"},
+{q:"犬伝染性肝炎の伝播に関して正しいものはどれか。",choices:["感染尿・唾液・鼻汁などから伝播し得る","蚊だけで伝播する","遺伝病なので伝播しない"],answer:0,ex:"感染尿・唾液・鼻汁との直接接触、口鼻経路で感染するとされる。"},
+{q:"Bordetella bronchiseptica感染症の説明として正しいものはどれか。",choices:["犬の咳に関与する細菌性呼吸器感染症","猫の糖尿病だけの原因","犬パルボウイルスの別名"],answer:0,ex:"Bordetella bronchisepticaは犬のケンネルコフに関与する細菌として説明される。"},
+{q:"Bordetella bronchisepticaの環境中の存在場所として示されるものはどれか。",choices:["犬の呼吸器分泌物、ケージ床、グルーミング台、体重計、舗装面など","滅菌済み注射針内部だけ","新鮮な未汚染飲用水だけ"],answer:0,ex:"呼吸器分泌物、床・グルーミング台・体重計・舗装面などから検出され得る。"},
+{q:"Bordetella bronchiseptica感染症の臨床徴候として示されるものはどれか。",choices:["咳、くしゃみ、発熱、鼻汁、呼吸困難、食欲不振、体重減少","黄疸だけ","皮膚の脱毛だけ"],answer:0,ex:"咳、くしゃみ、発熱、鼻汁、呼吸困難、食欲不振、体重減少が挙げられている。"},
+{q:"狂犬病ウイルスの伝播で特に重要なものはどれか。",choices:["感染動物の唾液、咬傷","尿で汚染された水だけ","ダニ媒介だけ"],answer:0,ex:"狂犬病は感染動物の唾液や咬傷で伝播し得る。公衆衛生上極めて重要である。"},
+{q:"狂犬病の潜伏期について本文の記載に合うものはどれか。",choices:["9日から1年以上と幅がある","必ず1時間以内","必ず10年"],answer:0,ex:"潜伏期は9日から1年以上と幅広く、ウイルスが神経系を上行すると説明されている。"},
+{q:"狂犬病の第1期の徴候として示されるものはどれか。",choices:["発熱、軽度の行動変化、瞳孔散大、眼反射低下","大量流涎と麻痺だけ","急性血様下痢だけ"],answer:0,ex:"第1期として発熱、軽度行動変化、瞳孔拡大、眼反射低下が示されている。"},
+{q:"狂犬病の第3期で示される徴候として適切なのはどれか。",choices:["麻痺、過剰流涎、呼吸困難、死亡","軽い咳のみ","一過性の食欲増加"],answer:0,ex:"第3期では麻痺、過剰流涎、呼吸困難、呼吸不全、死亡が示される。"},
+{q:"バベシア症の病態として正しいものはどれか。",choices:["赤血球内寄生原虫により貧血・血色素尿などを起こし得る","皮膚表面の真菌だけで起こる","ワクチンで発症する非感染性疾患"],answer:0,ex:"Babesia canisなどが赤血球に寄生し、赤血球破壊による貧血、血色素尿、黄疸などを起こす。"},
+{q:"バベシア症の伝播に関して正しいものはどれか。",choices:["ダニによって伝播する","唾液の乾燥だけで伝播する","食品添加物で伝播する"],answer:0,ex:"バベシア症はダニによって伝播する。流行地への渡航歴やダニ予防が重要になる。"},
+{q:"ワクチン接種の目的として最も適切なのはどれか。",choices:["病原体またはその成分を安全な形で提示し、特異的免疫を誘導する","感染症を直接治療する抗菌薬として使う","免疫を完全に停止させる"],answer:0,ex:"ワクチンは病原体を弱毒化・不活化・成分化して提示し、抗体産生などの適応免疫を刺激する。"},
+{q:"ワクチン接種後の免疫記憶に関して正しいものはどれか。",choices:["同じ病原体への再曝露時に迅速な反応を可能にする","全ての感染を永久に100％防ぐ","接種直後から一生涯必ず最大効果が続く"],answer:0,ex:"免疫記憶は再曝露時の迅速な免疫応答に寄与する。ただし効果は病原体・個体・接種計画により異なる。"},
+{q:"子犬の初期ワクチンで複数回接種が必要になる主な理由はどれか。",choices:["移行抗体がワクチン応答を干渉する時期があるため","子犬には免疫細胞が全く存在しないため","1回目は必ず病気を起こすため"],answer:0,ex:"母犬由来抗体が初回ワクチンの反応を妨げることがあるため、複数回接種が必要になる。"},
+{q:"グルーミングサロンでワクチン確認が重要な理由はどれか。",choices:["多数の犬が集まり、感染症伝播リスクを下げるため","美容技術を高めるためだけ","料金計算を簡単にするためだけ"],answer:0,ex:"グルーミング施設では犬が密集し、感染リスクがあるため、ワクチン確認が予防策の一部になる。"},
+{q:"感染予防の考え方として正しいものはどれか。",choices:["ワクチンは予防策の一部であり、衛生管理と清掃も不可欠","ワクチン接種済みなら清掃は不要","消毒より香料の使用が最重要"],answer:0,ex:"ワクチンは予防的健康計画の一部にすぎず、良好な衛生基準と清掃が必要である。"},
+{q:"尿で汚染されたケージや寝具を扱う際の注意として最も適切なのはどれか。",choices:["使い捨て手袋を用い、エアロゾルを吸入しないよう注意する","素手で強く振り回して乾かす","犬に舐めさせて清掃する"],answer:0,ex:"レプトスピラ対策として、尿汚染物を扱う際は手袋を用い、エアロゾル化した尿を吸入しないよう注意する。"},
+{q:"動物が咬傷を起こした場合の対応として本文の趣旨に合うものはどれか。",choices:["医療的助言を求め、咬傷動物を観察対象とする","何も記録せず通常業務に戻る","必ず自己判断で抗菌薬だけ飲む"],answer:0,ex:"犬に咬まれた場合には医療的助言を求め、動物は観察されるべきである。"}
+];
+let current=0,score=0,userAnswers=Array(questions.length).fill(null);const app=document.getElementById('app');
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderQuestion(){const q=questions[current],pct=Math.round(current/questions.length*100);app.innerHTML=`<div class="topbar"><span class="badge">問題 ${current+1} / ${questions.length}</span><span class="small">正答数：${score}　未回答：${questions.filter((_,i)=>userAnswers[i]===null).length}</span></div><div class="progress-wrap"><div class="progress" style="width:${pct}%"></div></div><div class="question">${esc(q.q)}</div><div class="choices">${q.choices.map((c,i)=>`<button class="choice" data-i="${i}">${['A','B','C'][i]}. ${esc(c)}</button>`).join('')}</div><div class="explain" id="explain"></div><div class="actions"><button class="btn secondary" onclick="prevQuestion()" ${current===0?'disabled':''}>前へ</button><button class="btn" onclick="nextQuestion()">${current===questions.length-1?'結果を見る':'次へ'}</button><button class="btn ghost" onclick="restart()">最初から</button></div>`;document.querySelectorAll('.choice').forEach(b=>b.addEventListener('click',choose));if(userAnswers[current]!==null)showAnswer(userAnswers[current])}
+function choose(e){if(userAnswers[current]!==null)return;const s=Number(e.currentTarget.dataset.i);userAnswers[current]=s;if(s===questions[current].answer)score++;showAnswer(s)}
+function showAnswer(s){const q=questions[current];document.querySelectorAll('.choice').forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add('correct');if(i===s&&i!==q.answer)b.classList.add('wrong')});const ex=document.getElementById('explain');ex.style.display='block';ex.innerHTML=`<strong>${s===q.answer?'正解です。':'不正解です。'} 正解：${['A','B','C'][q.answer]}. ${esc(q.choices[q.answer])}</strong><br>${esc(q.ex)}`}
+function nextQuestion(){if(current<questions.length-1){current++;renderQuestion()}else renderResult()}
+function prevQuestion(){if(current>0){current--;renderQuestion()}}
+function renderResult(){const rate=Math.round(score/questions.length*100);app.innerHTML=`<div class="result"><div class="badge">結果</div><div class="score">${score} / ${questions.length}</div><p>${rate}％ 正答</p><p class="small">${rate>=90?'非常に良好です。スタッフ教育の確認テストとして十分使えます。':rate>=70?'基礎は押さえています。誤答問題を復習しましょう。':'感染経路と主要疾患の整理から復習しましょう。'}</p><button class="btn" onclick="restart()">もう一度解く</button> <button class="btn ghost" onclick="showReview()">解答一覧を見る</button></div><div id="review" class="review"></div>`}
+function showReview(){document.getElementById('review').innerHTML=questions.map((q,i)=>`<div class="review-card"><strong>Q${i+1}. ${esc(q.q)}</strong><br><span>あなたの解答：${userAnswers[i]===null?'未回答':['A','B','C'][userAnswers[i]]}</span><br><span>正解：${['A','B','C'][q.answer]}. ${esc(q.choices[q.answer])}</span><p class="small">${esc(q.ex)}</p></div>`).join('')}
+function restart(){current=0;score=0;userAnswers=Array(questions.length).fill(null);renderQuestion()}
+renderQuestion();
+</script>
+</body>
+</html>
